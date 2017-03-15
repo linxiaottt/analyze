@@ -5,16 +5,19 @@
 </template>
 <script>
     import echarts from 'echarts';
+    import fetch from 'node-fetch';
+
     export default {
         data () {
             return {
+                page: 1,
                 chart: null
             };
         },
         methods: {
             draw () {
                 let option = {};
-                var data0 = splitData([
+                const data0 = splitData([
                     ['2013/1/24', 2320.26,2320.26,2287.3,2362.94],
                     ['2013/1/25', 2300,2291.3,2288.26,2308.38],
                     ['2013/1/28', 2295.35,2346.5,2295.35,2346.92],
@@ -303,15 +306,25 @@ option = {
             normal: {opacity: 0.5}
         }
     },
-
     ]
 };
 this.chart.setOption(option);
-}
+},
+async getData () {
+    const market = 'sh';
+    const method = 'GET';
+    const page = this.page;
+    const url = 'http://ali-stock.showapi.com/stockindexsearch';
+    const headers = { Authorization: 'APPCODE2a9cbf8f1cea41ce98fb79463fca656c' };
+    const data = await fetch(`${url}?page=${page}&market=${market}`, { headers })
+        .then((res) => { if (res && res.status == 200) return res.json(); return null; });
+    if (!data) return console.log('查询失败');
+},
 },
 mounted () {
     const chart = this.$refs.chart;
     this.chart = echarts.init(chart);
+    this.getData();
     this.draw();
 }
 };
