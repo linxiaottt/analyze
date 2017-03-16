@@ -43,7 +43,9 @@ export const STOCK = {
     },
     // 股票实时行情
     "STOCK_REAL_STOCK_INFO": {
-
+      "method": "GET",
+        "name": "STOCK_REAL_STOCK_INFO",
+        "path": "http://ali-stock.showapi.com/real-stockinfo"
     },
     // 股票实时行情_批量
     "STOCK_BATCH_REAL_STOCK_INFO": {

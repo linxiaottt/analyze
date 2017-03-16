@@ -1,7 +1,15 @@
 import { STOCK } from '../common/constants';
 
 export default {
-    [STOCK.STOCK_INDEX_SEARCH.name] (state, payload) {},
+    [STOCK.STOCK_INDEX_SEARCH.name] (state, payload) {
+        console.log(payload, 'xxxx');
+        const { contentList } = payload;
+        delete payload.contentList;
+        for (const key in payload) {
+            contentList[key] = payload[key];
+        }
+        state.indexListSearch = payload.contentList;
+    },
     [STOCK.STOCK_INDEX_TIMELINE.name] (state, payload) {},
     [STOCK.STOCK_INDEX.name] (state, payload) {},
     [STOCK.STOCK_REALTIME_K.name] (state, payload) {},

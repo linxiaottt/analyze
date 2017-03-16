@@ -22,17 +22,17 @@ export default function FETCH (path, options = {}) {
     fetch(path, config).then((response) => {
         if (!(response instanceof Object)) return final();
 
-        const data = response.json();
-        if (!(response.staus == 200 || data instanceof Object)) return error(final());
+        const payload = response.json();
+        if (!(response.staus == 200 || payload instanceof Object)) return error(final());
         success();
-        commit(type, { data });
+        commit(type, payload);
 
     });
 }
 
-FETCH.get = function (path, options) {
+FETCH.GET = FETCH.get = function (path, options) {
     FETCH(path, { ...options, method: 'GET' });
 };
-FETCH.post = function (path, options) {
+FETCH.POST = FETCH.post = function (path, options) {
     FETCH(path, { ...options, method: 'POST' });
 };

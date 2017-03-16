@@ -17,6 +17,8 @@
     "eslint-config-vue": "^2.0.2",
     "eslint-plugin-vue": "^2.0.1",
     "node-fetch": "^1.6.3",
+    "node-sass": "^4.5.0",
+    "sass-loader": "^6.0.3",
     "vue": "^2.2.2",
     "vue-router": "^2.2.0",
     "vuex": "^2.2.1"

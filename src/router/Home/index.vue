@@ -2,14 +2,30 @@
     <div class = "home-container">
         <div class = "main" :style = "{ top: -state.index * height + 'px' }">
             <section class = "section" id = "sec-1">
-                <div id = "chart" ref = "chart" ></div>
+                <h1>股票分析系统</h1>
             </section>
             <section class = "section" id = "sec-2">
-                <span>ssssssss</span>
+                <div class = "drop-down">
+                    <span>
+                        {{ state.curMarket ? `${ state.curMarket.short.toUpperCase() }(${ state.curMarket.name})` : ''}}
+                    </span>
+                    <ul>
+                        <li
+                            v-for = "(item, index) in stock.markets"
+                            @click = "handleClickSelectMarket(item)"
+                            :key = "index">{{ `${item.short.toUpperCase()}(${item.name})` }}</li>
+                    </ul>
+                </div>
+                <div class = "sec-2-content">
+
+                </div>
+            </section>
+            <section class = "section" id = "sec-3">
+                <div id = "chart" ref = "chart" ></div>
             </section>
         </div>
         <div class = "main-list">
-                <a v-for = "(item, index) in getList(n)"
+                <a v-for = "(item, index) in newList(n)"
                 :class = "{ active: item === state.index }"
                 :key = "index"></a>
         </div>
@@ -18,6 +34,8 @@
 <script>
     import echarts from 'echarts';
     import fetch from 'node-fetch';
+    import { mapState } from 'vuex';
+    import { STOCK } from '../../common/constants';
 
     export default {
         data () {
@@ -25,12 +43,32 @@
                 n: 5,
                 page: 1,
                 chart: null,
+                height: window.innerHeight,
                 state: {
                     index: 0,
+                    curMarket: null,
                     isTurning: false,
                 },
-                height: window.innerHeight,
+                stock: {
+                    markets: [{ short: 'sh', name: '上海' }, { short: 'sz', name: '深圳' }, { short: 'hk', name: '香港'}],
+                }
             };
+        },
+        computed: {
+            ...mapState([
+                'indexListSearch',
+                'indexTimeLine',
+                'indexList',
+                'realTimeK',
+                'timeline',
+                'history',
+                'kLine',
+                'realStockInfo',
+                'batchRealStockInfo',
+                'nameToStockInfo',
+                'stockList',
+                'recentTrade'
+            ]),
         },
         methods: {
             draw () {
@@ -124,188 +162,188 @@
                     ['2013/6/6', 2264.43,2242.11,2240.07,2266.69],
                     ['2013/6/7', 2242.26,2210.9,2205.07,2250.63],
                     ['2013/6/13', 2190.1,2148.35,2126.22,2190.1]
-                    ]);
+                ]);
 
-function splitData(rawData) {
-    var categoryData = [];
-    var values = []
-    for (var i = 0; i < rawData.length; i++) {
-        categoryData.push(rawData[i].splice(0, 1)[0]);
-        values.push(rawData[i])
-    }
-    return {
-        categoryData: categoryData,
-        values: values
-    };
-}
-
-function calculateMA(dayCount) {
-    var result = [];
-    for (var i = 0, len = data0.values.length; i < len; i++) {
-        if (i < dayCount) {
-            result.push('-');
-            continue;
-        }
-        var sum = 0;
-        for (var j = 0; j < dayCount; j++) {
-            sum += data0.values[i - j][1];
-        }
-        result.push(sum / dayCount);
-    }
-    return result;
-}
-
-option = {
-    title: {
-        text: '上证指数',
-        left: 0
-    },
-    tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-            type: 'line'
-        }
-    },
-    legend: {
-        data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30']
-    },
-    grid: {
-        left: '10%',
-        right: '10%',
-        bottom: '15%'
-    },
-    xAxis: {
-        type: 'category',
-        data: data0.categoryData,
-        scale: true,
-        boundaryGap : false,
-        axisLine: {onZero: false},
-        splitLine: {show: false},
-        splitNumber: 20,
-        min: 'dataMin',
-        max: 'dataMax'
-    },
-    yAxis: {
-        scale: true,
-        splitArea: {
-            show: true
-        }
-    },
-    dataZoom: [{
-        type: 'inside',
-        start: 50,
-        end: 100
-    }, {
-        show: true,
-        type: 'slider',
-        y: '90%',
-        start: 50,
-        end: 100
-    }],
-    series: [{
-        name: '日K',
-        type: 'candlestick',
-        data: data0.values,
-        markPoint: {
-            label: {
-                normal: {
-                    formatter: function (param) {
-                        return param != null ? Math.round(param.value) : '';
+                function splitData(rawData) {
+                    var categoryData = [];
+                    var values = []
+                    for (var i = 0; i < rawData.length; i++) {
+                        categoryData.push(rawData[i].splice(0, 1)[0]);
+                        values.push(rawData[i])
                     }
+                    return {
+                        categoryData: categoryData,
+                        values: values
+                    };
                 }
-            },
-            data: [{
-                name: 'XX标点',
-                coord: ['2013/5/31', 2300],
-                value: 2300,
-                itemStyle: {
-                    normal: {color: 'rgb(41,60,85)'}
+
+                function calculateMA(dayCount) {
+                    var result = [];
+                    for (var i = 0, len = data0.values.length; i < len; i++) {
+                        if (i < dayCount) {
+                            result.push('-');
+                            continue;
+                        }
+                        var sum = 0;
+                        for (var j = 0; j < dayCount; j++) {
+                            sum += data0.values[i - j][1];
+                        }
+                        result.push(sum / dayCount);
+                    }
+                    return result;
                 }
-            }, {
-                name: 'highest value',
-                type: 'max',
-                valueDim: 'highest'
-            }, {
-                name: 'lowest value',
-                type: 'min',
-                valueDim: 'lowest'
-            }, {
-                name: 'average value on close',
-                type: 'average',
-                valueDim: 'close'
-            }],
-            tooltip: {
-                formatter: function (param) {
-                    return param.name + '<br>' + (param.data.coord || '');
-                }
-            }
-        },
-        markLine: {
-            symbol: ['none', 'none'],
-            data: [[{
-                name: 'from lowest to highest',
-                type: 'min',
-                valueDim: 'lowest',
-                symbol: 'circle',
-                symbolSize: 10,
-                label: {
-                    normal: {show: false},
-                    emphasis: {show: false}
-                }
-            }, {
-                type: 'max',
-                valueDim: 'highest',
-                symbol: 'circle',
-                symbolSize: 10,
-                label: {
-                    normal: {show: false},
-                    emphasis: {show: false}
-                }
-            }], {
-                name: 'min line on close',
-                type: 'min',
-                valueDim: 'close'
-            }, {
-                name: 'max line on close',
-                type: 'max',
-                valueDim: 'close'
-            }]
-        }
-    }, {
-        name: 'MA5',
-        type: 'line',
-        data: calculateMA(5),
-        smooth: true,
-        lineStyle: {
-            normal: {opacity: 0.5}
-        }
-    }, {
-        name: 'MA10',
-        type: 'line',
-        data: calculateMA(10),
-        smooth: true,
-        lineStyle: {
-            normal: {opacity: 0.5}
-        }
-    }, {
-        name: 'MA20',
-        type: 'line',
-        data: calculateMA(20),
-        smooth: true,
-        lineStyle: {
-            normal: {opacity: 0.5}
-        }
-    }, {
-        name: 'MA30',
-        type: 'line',
-        data: calculateMA(30),
-        smooth: true,
-        lineStyle: {
-            normal: {opacity: 0.5}
-        }
-    }]
-};
-this.chart.setOption(option);
+
+                option = {
+                    title: {
+                        text: '上证指数',
+                        left: 0
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'line'
+                        }
+                    },
+                    legend: {
+                        data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30']
+                    },
+                    grid: {
+                        left: '10%',
+                        right: '10%',
+                        bottom: '15%'
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: data0.categoryData,
+                        scale: true,
+                        boundaryGap : false,
+                        axisLine: {onZero: false},
+                        splitLine: {show: false},
+                        splitNumber: 20,
+                        min: 'dataMin',
+                        max: 'dataMax'
+                    },
+                    yAxis: {
+                        scale: true,
+                        splitArea: {
+                            show: true
+                        }
+                    },
+                    dataZoom: [{
+                        type: 'inside',
+                        start: 50,
+                        end: 100
+                    }, {
+                        show: true,
+                        type: 'slider',
+                        y: '90%',
+                        start: 50,
+                        end: 100
+                    }],
+                    series: [{
+                        name: '日K',
+                        type: 'candlestick',
+                        data: data0.values,
+                        markPoint: {
+                            label: {
+                                normal: {
+                                    formatter: function (param) {
+                                        return param != null ? Math.round(param.value) : '';
+                                    }
+                                }
+                            },
+                            data: [{
+                                name: 'XX标点',
+                                coord: ['2013/5/31', 2300],
+                                value: 2300,
+                                itemStyle: {
+                                    normal: {color: 'rgb(41,60,85)'}
+                                }
+                            }, {
+                                name: 'highest value',
+                                type: 'max',
+                                valueDim: 'highest'
+                            }, {
+                                name: 'lowest value',
+                                type: 'min',
+                                valueDim: 'lowest'
+                            }, {
+                                name: 'average value on close',
+                                type: 'average',
+                                valueDim: 'close'
+                            }],
+                            tooltip: {
+                                formatter: function (param) {
+                                    return param.name + '<br>' + (param.data.coord || '');
+                                }
+                            }
+                        },
+                        markLine: {
+                            symbol: ['none', 'none'],
+                            data: [[{
+                                name: 'from lowest to highest',
+                                type: 'min',
+                                valueDim: 'lowest',
+                                symbol: 'circle',
+                                symbolSize: 10,
+                                label: {
+                                    normal: {show: false},
+                                    emphasis: {show: false}
+                                }
+                            }, {
+                                type: 'max',
+                                valueDim: 'highest',
+                                symbol: 'circle',
+                                symbolSize: 10,
+                                label: {
+                                    normal: {show: false},
+                                    emphasis: {show: false}
+                                }
+                            }], {
+                                name: 'min line on close',
+                                type: 'min',
+                                valueDim: 'close'
+                            }, {
+                                name: 'max line on close',
+                                type: 'max',
+                                valueDim: 'close'
+                            }]
+                        }
+                    }, {
+                        name: 'MA5',
+                        type: 'line',
+                        data: calculateMA(5),
+                        smooth: true,
+                        lineStyle: {
+                            normal: {opacity: 0.5}
+                        }
+                    }, {
+                        name: 'MA10',
+                        type: 'line',
+                        data: calculateMA(10),
+                        smooth: true,
+                        lineStyle: {
+                            normal: {opacity: 0.5}
+                        }
+                    }, {
+                        name: 'MA20',
+                        type: 'line',
+                        data: calculateMA(20),
+                        smooth: true,
+                        lineStyle: {
+                            normal: {opacity: 0.5}
+                        }
+                    }, {
+                        name: 'MA30',
+                        type: 'line',
+                        data: calculateMA(30),
+                        smooth: true,
+                        lineStyle: {
+                            normal: {opacity: 0.5}
+                        }
+                    }]
+                };
+                this.chart.setOption(option);
             },
             handleMouseWheel (event) {
                 if (this.state.isTurning) return;
@@ -315,6 +353,12 @@ this.chart.setOption(option);
                 if (wheelDelta >= 0) this.turnPage(false); // 向上翻页
                 else this.turnPage(true); // 向上翻页
             },
+            handleClickSelectMarket (item) {
+                const page = 1;
+                const market = item.short;
+                this.state.curMarket = item;
+                this.getIndexListSearch({ page, market });
+            },
             turnPage (signal) {
                 const { n } = this;
                 let { index } = this.state;
@@ -323,22 +367,104 @@ this.chart.setOption(option);
                 index = Math.max(index, 0);
                 this.state.index = index;
             },
-            getList (n) {
+            newList (n) {
                 return new Array(n).fill(n).map((item, index) => index);
+            },
+            // 股指列表查询
+            getIndexListSearch (data) {
+                const { page, market } = data;
+                this.publish(STOCK.STOCK_INDEX_SEARCH.name, { query: { page, market }});
+            },
+            // 股指实时分时线
+            getIndexTimeLine () {
+                const day = 1; // 1 - 5
+                const code = '000001';
+                this.publish(STOCK.STOCK_INDEX_TIMELINE.name, { query: { day, code }});
+            },
+            // 股指实时行情_批量
+            getIndexList () {
+                const stocks = 'sh000001,sz399001,sz399005,sz399006,hkhsi';
+                this.publish(STOCK.STOCK_INDEX.name, { query: { stocks }});
+            },
+            // 股票实时K线数据
+            getRealTimeK () {
+                const beginDay = '20170316';
+                const code = '000001';
+                const time = 'day'; // '5' || '30' || '60' || 'day' || 'week' || 'month'
+                const type = 'bfq'; // 'bfq' || 'qff'
+                this.publish(STOCK.STOCK_REALTIME_K.name, { query: { beginDay, code, time, type }});
+            },
+            // 股票实时K线数据
+            getTimeline () {
+                const day = '1';
+                const code = '601857';
+                this.publish(STOCK.STOCK_TIMELINE.name, { query: { day, code }});
+            },
+            // 沪深及港股历史行情
+            getHistory () {
+                const begin = '2017-03-15';
+                const code = '600004';
+                const end = '2017-03-16';
+                this.publish(STOCK.STOCK_SZ_SH_STOCK_HISTORY.name, {});
+            },
+            // 股指实时K线数据
+            getKLine () {
+                const beginDay = '20170316';
+                const code = '000001';
+                const time = 'day'; // '5' || '30' || '60' || 'day' || 'week' || 'month'
+                this.publish(STOCK.STOCK_INDEX_K_LINE.name, { query: { time, code, beginDay }});
+            },
+            // 股票实时行情
+            getRealStockInfo () {
+                const code = '000001';
+                const needIndex = 0; // 0 || 1;
+                const needKPic = 0; // 0 || 1;
+                this.publish(STOCK.STOCK_REAL_STOCK_INFO.name, { query: { code, needIndex, need_k_pic: needKPic}});
+            },
+            // 股票实时行情_批量
+            getBatchRealStockInfo () {
+                const needIndex = 0; // 0 || 1;
+                const stocks = 'sh000001,sz399001,sz399005,sz399006,hkhsi';
+                this.publish(STOCK.STOCK_BATCH_REAL_STOCK_INFO.name, { query: { stocks, needIndex }});
+            },
+            // 名称编码拼音查询股票信息
+            getNameToStockInfo () {
+                const code = '002739';
+                const name = '万达';
+                const pinyin = 'wd';
+                this.publish(STOCK.STOCK_NAME_TO_STOCK_INFO.name, { query: { code, name, pinyin }});
+            },
+            // 股票列表查询
+            getStockList () {
+                const market = 'sz';
+                const page = '1';
+                this.publish(STOCK.STOCK_LIST.name, { query: { market, page }});
+            },
+            // 沪深股票最新50条逐笔交易
+            getRecentTrade () {
+                const code = '000002';
+                this.publish(STOCK.STOCK_EVERY_TRADE.name, { query: { code }});
+            },
+            publish (type, payload) {
+                const { dispatch } = this.$store;
+                dispatch({ ... payload, type });
             },
         },
         mounted () {
             const chart = this.$refs.chart;
             this.chart = echarts.init(chart);
-            window.addEventListener('mousewheel', this.handleMouseWheel.bind(this));
             this.draw();
-        }
+            window.addEventListener('mousewheel', this.handleMouseWheel.bind(this));
+        },
+        beforeDestory () {
+            window.removeEventListener('mousewheel', this.handleMouseWheel);
+        },
     };
 </script>
-<style>
+<style lang = "scss">
     .home-container { width: 100%; height: 100%; overflow: hidden; position: relative; }
     .main { width: 100%; height: 100%; position: absolute; transition: 500ms cubic-bezier(0.86, 0, 0.07, 1); }
-    .section { width: 100%; height: 100%; display: block; color: #FFFFFF; }
+    .section { width: 100%; height: 100%; display: block; color: #FFFFFF; position: relative; }
     .main-list {
         width: 20px;
         right: 20px;
@@ -358,6 +484,50 @@ this.chart.setOption(option);
         border: 1px solid #ffffff;
     }
     .main-list .active { background-color: #ffffff; }
+    #sec-1 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    #sec-1 h1 {
+        margin: 0;
+        font-size: 100px;
+        padding-bottom: 200px;
+        box-sizing: border-box;
+        text-shadow: 1px 1px 3px #ffffff, 2px 2px 7px #ffffff, 3px 3px 10px #ffffff, 5px 5px 15px #000000;
+    }
+    #sec-2 { padding: 20px; box-sizing: border-box; }
+    #sec-2 .drop-down {
+        width: 128px;
+        height: 40px;
+        line-height: 40px;
+        margin: 0 auto;
+        color: #000000;
+        background: #FFFFFF;
+        position: absolute;
+        right: 20px;
+        box-sizing: border-box;
+        &:hover ul { opacity: 1; margin: 20px 0 0 0; }
+
+        span {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        ul {
+            list-style-type: none;
+            position: absolute;
+            background: inherit;
+            padding: 0;
+            margin: 10px 0 0 0;
+            opacity: 0;
+            width: 100%;
+            transition: all .5s ease;
+
+            li:hover { background: #4f7f9b; }
+        }
+    }
+    #sec-2 .sec-2-content {}
     #chart {
         width: 100%;
         height: 400px;
