@@ -11,8 +11,6 @@ export default {
 </script>
 
 <style>
-html { height: 100%; }
-body { margin: 0; height: 100%; }
 #app {
   color: #2c3e50;
   text-align: center;

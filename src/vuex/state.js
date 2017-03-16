@@ -14,7 +14,7 @@ export default  {
     // 股指实时K线数据
     kLine: [],
     // 股票实时行情
-    realStockInfo: [],
+    realStockInfo: {},
     // 股票实时行情_批量
     batchRealStockInfo: [],
     // 名称编码拼音查询股票信息

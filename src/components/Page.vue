@@ -13,24 +13,24 @@
 <template>
     <ul class = "page-container" v-if = "maxPage">
         <li class = "page-head"
-            v-if = "isnotFirstPage"
-            @click = "onClickPageItem(firstPage)">首页</li>
+        v-if = "isnotFirstPage"
+        @click = "onClickPageItem(firstPage)">首页</li>
         <li v-if = "isnotFirstPage"
-            @click = "onClickPageItem(prevPage)">上一页</li>
+        @click = "onClickPageItem(prevPage)">上一页</li>
         <li v-for = "item in pageList"
-            class = "page-item"
-            :class = "{active: curPage === item}"
-            @click = "onClickPageItem(item)"
+        class = "page-item"
+        :class = "{active: curPage === item}"
+        @click = "onClickPageItem(item)"
         >
-            {{ item }}
-        </li>
-        <li v-if = "isnotLastPage"
-            @click = "onClickPageItem(nextPage)">下一页</li>
-        <li class = "page-tail"
-            v-if = "isnotLastPage"
-            @click = "onClickPageItem(lastPage)">尾页</li>
-        <li class = "page-max"> 共 {{ maxPage }} 页</li>
-    </ul>
+        {{ item }}
+    </li>
+    <li v-if = "isnotLastPage"
+    @click = "onClickPageItem(nextPage)">下一页</li>
+    <li class = "page-tail"
+    v-if = "isnotLastPage"
+    @click = "onClickPageItem(lastPage)">尾页</li>
+    <li class = "page-max"> 共 {{ maxPage }} 页</li>
+</ul>
 </template>
 <script>
     export default {
@@ -82,13 +82,13 @@
         methods: {
             onClickPageItem (pageId) {
                 if (this.curPage !== pageId && this.handleClickPageItem) {
-                    this.handleClickPageItem(pageId);
+                    this.handleClickPageItem(pageId, this.curPage);
                 }
             },
         },
     };
 </script>
-<style lang = "sass">
+<style lang = "scss">
     .page-container {
         font-size: 0;
         margin: 0 auto;
@@ -110,13 +110,13 @@
 
         > li {
             font-size: 16px;
-            padding: 5 10px;
+            padding: 5px 10px;
             cursor: pointer;
             border-radius: 4px;
             display: inline-block;
             box-sizing: border-box;
             border: 1px solid #dddddd;
-            margin: 0 2px;
+            margin: 0 7px;
             transition: color .2s ease-in-out, background .2s ease-in-out;
 
             &:hover {

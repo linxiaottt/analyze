@@ -5,23 +5,57 @@
                 <h1>股票分析系统</h1>
             </section>
             <section class = "section" id = "sec-2">
-                <div class = "drop-down">
-                    <span>
-                        {{ state.curMarket ? `${ state.curMarket.short.toUpperCase() }(${ state.curMarket.name})` : ''}}
-                    </span>
-                    <ul>
-                        <li
-                            v-for = "(item, index) in stock.markets"
-                            @click = "handleClickSelectMarket(item)"
-                            :key = "index">{{ `${item.short.toUpperCase()}(${item.name})` }}</li>
-                    </ul>
+                <div class = "sec-2-filter">
+                    <div class = "drop-down">
+                        <span>
+                            {{ state.curMarket ? `${ state.curMarket.short.toUpperCase() }（${ state.curMarket.name}）` : '您要选哪个股市'}}
+                        </span>
+                        <ul>
+                            <li
+                                v-for = "(item, index) in stock.markets"
+                                @click = "handleClickSelectMarket(item)"
+                                :key = "index">{{ `${item.short.toUpperCase()}(${item.name})` }}</li>
+                        </ul>
+                    </div>
                 </div>
                 <div class = "sec-2-content">
-
+                    <div class= "sec-2-list" v-if = "indexListSearch.length">
+                        <ul>
+                            <span>\</span>
+                            <li>市场</li>
+                            <li>名字</li>
+                            <li>代码</li>
+                            <li>拼音</li>
+                        </ul>
+                        <ul v-for = "(row, rowIndex) in indexListSearch.slice((state.indexSearchPage - 1) * numPerPage, state.indexSearchPage * numPerPage)"
+                            :key = "rowIndex">
+                            <span>
+                                {{ (rowIndex + 1) + (indexListSearch.currentPage - 1) * indexListSearch.maxResult + (state.indexSearchPage - 1) *numPerPage }}
+                            </span>
+                            <li v-for = "(col, colIndex) in row"
+                                :key = "colIndex">
+                                {{ col }}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class = "sec-2-info">
+                        <div class = "sec-2-page-wrap">
+                            <Page
+                                :pageLimit = "7"
+                                :maxPage = "Math.floor(indexListSearch.allNum / numPerPage)"
+                                :curPage = "(indexListSearch.currentPage - 1) * indexListSearch.maxResult / numPerPage + state.indexSearchPage"
+                                :handleClickPageItem = "clickIndexListSearchPageItem"
+                                />
+                        </div>
+                    </div>
                 </div>
             </section>
             <section class = "section" id = "sec-3">
-                <div id = "chart" ref = "chart" ></div>
+
+            </section>
+            <section class = "section" id = "sec-4">
+                <h2>上证指数</h2>
+                <div id = "chart" ref = "chart"></div>
             </section>
         </div>
         <div class = "main-list">
@@ -35,19 +69,22 @@
     import echarts from 'echarts';
     import fetch from 'node-fetch';
     import { mapState } from 'vuex';
+    import Page from '../../components/Page';
     import { STOCK } from '../../common/constants';
 
     export default {
         data () {
             return {
-                n: 5,
-                page: 1,
+                n: 5, // 总共的页数
+                page: 1, // 当前页
+                numPerPage: 10, // 每页最多显示10条数据
                 chart: null,
                 height: window.innerHeight,
                 state: {
                     index: 0,
                     curMarket: null,
                     isTurning: false,
+                    indexSearchPage: 1,
                 },
                 stock: {
                     markets: [{ short: 'sh', name: '上海' }, { short: 'sz', name: '深圳' }, { short: 'hk', name: '香港'}],
@@ -70,6 +107,7 @@
                 'recentTrade'
             ]),
         },
+        components: { Page },
         methods: {
             draw () {
                 let option = {};
@@ -359,6 +397,23 @@
                 this.state.curMarket = item;
                 this.getIndexListSearch({ page, market });
             },
+            clickIndexListSearchPageItem (index, oldIndex) {
+                const config = {};
+                const { numPerPage } = this;
+                const { curMarket } = this.state;
+                const { currentPage, maxResult } = this.indexListSearch;
+
+                const nPart = Math.floor(maxResult / numPerPage);
+                const rest = (index - 1) % nPart + 1;
+                const divide = Math.floor((index - 1) / nPart);
+
+                const success = () => { this.state.indexSearchPage = rest; };
+                if (divide !== Math.floor(oldIndex / nPart )) {
+                    this.getIndexListSearch({ page: divide + 1, market: curMarket, success });
+                } else {
+                    this.state.indexSearchPage = rest;
+                }
+            },
             turnPage (signal) {
                 const { n } = this;
                 let { index } = this.state;
@@ -372,8 +427,9 @@
             },
             // 股指列表查询
             getIndexListSearch (data) {
-                const { page, market } = data;
-                this.publish(STOCK.STOCK_INDEX_SEARCH.name, { query: { page, market }});
+                const { page, market, success } = data;
+                const { maxResult } = 10;
+                this.publish(STOCK.STOCK_INDEX_SEARCH.name, { success, query: { page, market, maxResult }});
             },
             // 股指实时分时线
             getIndexTimeLine () {
@@ -402,14 +458,14 @@
             },
             // 沪深及港股历史行情
             getHistory () {
-                const begin = '2017-03-15';
+                const begin = '2017-03-14';
                 const code = '600004';
-                const end = '2017-03-16';
-                this.publish(STOCK.STOCK_SZ_SH_STOCK_HISTORY.name, {});
+                const end = '2017-03-15';
+                this.publish(STOCK.STOCK_SZ_SH_STOCK_HISTORY.name, { query: { begin, code, end } });
             },
             // 股指实时K线数据
             getKLine () {
-                const beginDay = '20170316';
+                const beginDay = '20170315';
                 const code = '000001';
                 const time = 'day'; // '5' || '30' || '60' || 'day' || 'week' || 'month'
                 this.publish(STOCK.STOCK_INDEX_K_LINE.name, { query: { time, code, beginDay }});
@@ -454,6 +510,18 @@
             const chart = this.$refs.chart;
             this.chart = echarts.init(chart);
             this.draw();
+            // 测试api
+            // this.getIndexTimeLine();
+            // this.getIndexList();
+            // this.getRealTimeK();
+            // this.getTimeline();
+            // this.getHistory();
+            // this.getKLine();
+            // this.getRealStockInfo();
+            // this.getBatchRealStockInfo();
+            // this.getNameToStockInfo();
+            // this.getStockList();
+            // this.getRecentTrade();
             window.addEventListener('mousewheel', this.handleMouseWheel.bind(this));
         },
         beforeDestory () {
@@ -464,7 +532,7 @@
 <style lang = "scss">
     .home-container { width: 100%; height: 100%; overflow: hidden; position: relative; }
     .main { width: 100%; height: 100%; position: absolute; transition: 500ms cubic-bezier(0.86, 0, 0.07, 1); }
-    .section { width: 100%; height: 100%; display: block; color: #FFFFFF; position: relative; }
+    .section { width: 100%; height: 100%; display: block; color: #FFFFFF; position: relative; overflow: hidden; padding: 20px; box-sizing: border-box; }
     .main-list {
         width: 20px;
         right: 20px;
@@ -496,38 +564,92 @@
         box-sizing: border-box;
         text-shadow: 1px 1px 3px #ffffff, 2px 2px 7px #ffffff, 3px 3px 10px #ffffff, 5px 5px 15px #000000;
     }
-    #sec-2 { padding: 20px; box-sizing: border-box; }
-    #sec-2 .drop-down {
-        width: 128px;
-        height: 40px;
-        line-height: 40px;
-        margin: 0 auto;
-        color: #000000;
-        background: #FFFFFF;
-        position: absolute;
-        right: 20px;
-        box-sizing: border-box;
-        &:hover ul { opacity: 1; margin: 20px 0 0 0; }
+    #sec-2 { box-sizing: border-box; }
 
-        span {
+    .sec-2-filter {
+        margin: 40px 0 40px;
+        position: relative;
+        &:after {
+            content: '.';
+            font-size: 0;
             display: block;
-            width: 100%;
-            height: 100%;
+            clear: both;
         }
-        ul {
-            list-style-type: none;
-            position: absolute;
-            background: inherit;
-            padding: 0;
-            margin: 10px 0 0 0;
-            opacity: 0;
-            width: 100%;
-            transition: all .5s ease;
+        .drop-down {
+            width: 128px;
+            height: 40px;
+            line-height: 40px;
+            margin: 0 auto;
+            color: #000000;
+            background: #FFFFFF;
+            position: relative;
+            float: right;
+            right: 20px;
+            box-sizing: border-box;
+            &:hover ul { opacity: 1; margin: 20px 0 0 0; }
 
-            li:hover { background: #4f7f9b; }
+            span {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+            ul {
+                list-style-type: none;
+                position: absolute;
+                background: inherit;
+                padding: 0;
+                margin: 10px 0 0 0;
+                opacity: 0;
+                width: 100%;
+                transition: all .5s ease;
+
+                li:hover { background: #4f7f9b; color: #ffffff; }
+            }
         }
     }
-    #sec-2 .sec-2-content {}
+    #sec-2 .sec-2-content {
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /*box-shadow: 0px 0px 0px 1px #ffffff;*/
+            /*& { border-bottom: 1px solid #ffffff; };*/
+        }
+        .sec-2-list {
+            display: flex;
+            flex-direction: column;
+            ul {
+                display: flex;
+                margin: 0 auto;
+                flex-direction: row;
+                border-bottom: 1px solid #ffffff;
+                &:first-child { border-top: 1px solid #ffffff; }
+                &:nth-child(2n) { background: rgba(43, 121, 179, .3); }
+                span {
+                    width: 50px;
+                    @extend .cell;
+                    border: 1px solid #ffffff;
+                    border-width: 0 1px;
+                }
+                li {
+                    width: 180px;
+                    height: 30px;
+                    text-align:center;
+                    padding: 5px 10px;
+                    vertical-align: middle;
+                    box-sizing: border-box;
+                    box-shadow: 0px 0px 0px 1px #ffffff;
+                    &:hover { background: #ffffff; color: #000000; }
+                    @extend .cell;
+                }
+            }
+        }
+    }
+
+    #sec-3 {}
+    #sec-4 {
+        h2 { font-size: 40px;  padding: 30px; }
+    }
     #chart {
         width: 100%;
         height: 400px;
