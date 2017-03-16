@@ -11,7 +11,7 @@ export default function FETCH (path, options = {}) {
 
     if (body && body instanceof Object && method === 'POST') config.body = body;
     if (query && query instanceof Object) path = `${path}?` + qs.stringify(query);
-    config.headers = { ...header, 'Authorization': '2a9cbf8f1cea41ce98fb79463fca656c' };
+    config.headers = { ...header, 'Authorization': 'APPCODE 2a9cbf8f1cea41ce98fb79463fca656c' };
     // 产生错误执行的函数
     error = typeof error === 'function'? error: () => {};
     // 无论如何 最终都会执行的函数

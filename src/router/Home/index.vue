@@ -1,6 +1,18 @@
 <template>
     <div class = "home-container">
-        <div id = "chart" ref = "chart" ></div>
+        <div class = "main" :style = "{ top: -state.index * height + 'px' }">
+            <section class = "section" id = "sec-1">
+                <div id = "chart" ref = "chart" ></div>
+            </section>
+            <section class = "section" id = "sec-2">
+                <span>ssssssss</span>
+            </section>
+        </div>
+        <div class = "main-list">
+                <a v-for = "(item, index) in getList(n)"
+                :class = "{ active: item === state.index }"
+                :key = "index"></a>
+        </div>
     </div>
 </template>
 <script>
@@ -10,8 +22,14 @@
     export default {
         data () {
             return {
+                n: 5,
                 page: 1,
-                chart: null
+                chart: null,
+                state: {
+                    index: 0,
+                    isTurning: false,
+                },
+                height: window.innerHeight,
             };
         },
         methods: {
@@ -108,7 +126,6 @@
                     ['2013/6/13', 2190.1,2148.35,2126.22,2190.1]
                     ]);
 
-
 function splitData(rawData) {
     var categoryData = [];
     var values = []
@@ -137,6 +154,7 @@ function calculateMA(dayCount) {
     }
     return result;
 }
+
 option = {
     title: {
         text: '上证指数',
@@ -173,22 +191,18 @@ option = {
             show: true
         }
     },
-    dataZoom: [
-    {
+    dataZoom: [{
         type: 'inside',
         start: 50,
         end: 100
-    },
-    {
+    }, {
         show: true,
         type: 'slider',
         y: '90%',
         start: 50,
         end: 100
-    }
-    ],
-    series: [
-    {
+    }],
+    series: [{
         name: '日K',
         type: 'candlestick',
         data: data0.values,
@@ -200,31 +214,26 @@ option = {
                     }
                 }
             },
-            data: [
-            {
+            data: [{
                 name: 'XX标点',
                 coord: ['2013/5/31', 2300],
                 value: 2300,
                 itemStyle: {
                     normal: {color: 'rgb(41,60,85)'}
                 }
-            },
-            {
+            }, {
                 name: 'highest value',
                 type: 'max',
                 valueDim: 'highest'
-            },
-            {
+            }, {
                 name: 'lowest value',
                 type: 'min',
                 valueDim: 'lowest'
-            },
-            {
+            }, {
                 name: 'average value on close',
                 type: 'average',
                 valueDim: 'close'
-            }
-            ],
+            }],
             tooltip: {
                 formatter: function (param) {
                     return param.name + '<br>' + (param.data.coord || '');
@@ -233,9 +242,7 @@ option = {
         },
         markLine: {
             symbol: ['none', 'none'],
-            data: [
-            [
-            {
+            data: [[{
                 name: 'from lowest to highest',
                 type: 'min',
                 valueDim: 'lowest',
@@ -245,8 +252,7 @@ option = {
                     normal: {show: false},
                     emphasis: {show: false}
                 }
-            },
-            {
+            }, {
                 type: 'max',
                 valueDim: 'highest',
                 symbol: 'circle',
@@ -255,22 +261,17 @@ option = {
                     normal: {show: false},
                     emphasis: {show: false}
                 }
-            }
-            ],
-            {
+            }], {
                 name: 'min line on close',
                 type: 'min',
                 valueDim: 'close'
-            },
-            {
+            }, {
                 name: 'max line on close',
                 type: 'max',
                 valueDim: 'close'
-            }
-            ]
+            }]
         }
-    },
-    {
+    }, {
         name: 'MA5',
         type: 'line',
         data: calculateMA(5),
@@ -278,8 +279,7 @@ option = {
         lineStyle: {
             normal: {opacity: 0.5}
         }
-    },
-    {
+    }, {
         name: 'MA10',
         type: 'line',
         data: calculateMA(10),
@@ -287,8 +287,7 @@ option = {
         lineStyle: {
             normal: {opacity: 0.5}
         }
-    },
-    {
+    }, {
         name: 'MA20',
         type: 'line',
         data: calculateMA(20),
@@ -296,8 +295,7 @@ option = {
         lineStyle: {
             normal: {opacity: 0.5}
         }
-    },
-    {
+    }, {
         name: 'MA30',
         type: 'line',
         data: calculateMA(30),
@@ -305,31 +303,61 @@ option = {
         lineStyle: {
             normal: {opacity: 0.5}
         }
-    },
-    ]
+    }]
 };
 this.chart.setOption(option);
-},
-async getData () {
-    const market = 'sh';
-    const method = 'GET';
-    const page = this.page;
-    const url = 'http://ali-stock.showapi.com/stockindexsearch';
-    const headers = { Authorization: 'APPCODE2a9cbf8f1cea41ce98fb79463fca656c' };
-    const data = await fetch(`${url}?page=${page}&market=${market}`, { headers })
-        .then((res) => { if (res && res.status == 200) return res.json(); return null; });
-    if (!data) return console.log('查询失败');
-},
-},
-mounted () {
-    const chart = this.$refs.chart;
-    this.chart = echarts.init(chart);
-    this.getData();
-    this.draw();
-}
-};
+            },
+            handleMouseWheel (event) {
+                if (this.state.isTurning) return;
+                this.state.isTurning = true;
+                setTimeout(() => { this.state.isTurning = false; }, 1500);
+                const { wheelDelta } = event;
+                if (wheelDelta >= 0) this.turnPage(false); // 向上翻页
+                else this.turnPage(true); // 向上翻页
+            },
+            turnPage (signal) {
+                const { n } = this;
+                let { index } = this.state;
+                index = signal === false ? index - 1 : index + 1;
+                index = Math.min(index, n - 1);
+                index = Math.max(index, 0);
+                this.state.index = index;
+            },
+            getList (n) {
+                return new Array(n).fill(n).map((item, index) => index);
+            },
+        },
+        mounted () {
+            const chart = this.$refs.chart;
+            this.chart = echarts.init(chart);
+            window.addEventListener('mousewheel', this.handleMouseWheel.bind(this));
+            this.draw();
+        }
+    };
 </script>
 <style>
+    .home-container { width: 100%; height: 100%; overflow: hidden; position: relative; }
+    .main { width: 100%; height: 100%; position: absolute; transition: 500ms cubic-bezier(0.86, 0, 0.07, 1); }
+    .section { width: 100%; height: 100%; display: block; color: #FFFFFF; }
+    .main-list {
+        width: 20px;
+        right: 20px;
+        height: 100%;
+        display: flex;
+        position: fixed;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .main-list a {
+        width: 10px;
+        height: 10px;
+        margin: 10px 0;
+        display: block;
+        border-radius: 50%;
+        border: 1px solid #ffffff;
+    }
+    .main-list .active { background-color: #ffffff; }
     #chart {
         width: 100%;
         height: 400px;
