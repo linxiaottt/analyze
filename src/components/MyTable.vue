@@ -12,7 +12,7 @@
 !-->
 <template>
     <div class= "table-container" v-if = "this.props.data && this.props.data.length">
-        <p class = "table-title" v-if = "this.props.title"> {{ this.props.title }} </p>
+        <p class = "table-Mytitle" v-if = "this.props.title"> {{ this.props.title }} </p>
         <ul class = "table-head">
             <span class = "table-left-top">\</span>
             <li v-for= "(item, index) in this.props.head" :key = "index"> {{ item.name ? item.name: item }}</li>

@@ -1,8 +1,9 @@
 <template>
     <div class = "home-container">
         <div class = "main" :style = "{ top: -state.index * height + 'px' }">
-            <section class = "section" id = "sec-1">
+            <section class = "section" id = "sec-1" ref = "canvas">
                 <h1>股票分析系统</h1>
+                <!-- <Search :result = "[]" :handleSubmit = "()=> {}"/> -->
             </section>
             <section class = "section" id = "sec-2">
                 <div class = "sec-2-filter">
@@ -71,9 +72,14 @@
     import { mapState } from 'vuex';
 
     import Page from '../../components/Page';
+    import Search from '../../components/Search';
+    import MyTable from '../../components/MyTable';
+
     import { STOCK } from '../../common/constants';
     import { realTimeK } from '../../common/echart-stock';
 
+    import Canvas from './Canvas';
+    import Point, { distance } from './Point';
     export default {
         data () {
             return {
@@ -109,7 +115,7 @@
                 'recentTrade'
             ]),
         },
-        components: { Page },
+        components: { Page, MyTable, Search },
         watch: {
             realTimeK (data) {
                 this.drawRealTimeK(data);
@@ -129,8 +135,7 @@
                     values.push([list[1], list[3], list[0], list[2]]);
                 }
                 option.series[0].data = values;
-                option.series[1].data = volumns;
-                console.log(option);
+                option.series[1].data = volumns;console.l
                 option.xAxis[0].data = option.xAxis[1].data = times;
                 this.chart.setOption(option);
             },
@@ -256,10 +261,60 @@
                 const { dispatch } = this.$store;
                 dispatch({ ... payload, type });
             },
+            draw (ctx, pointes) {
+                var _self = window;
+                var mX = _self.mX;
+                var mY = _self.mY;
+
+                var width = ctx.canvas.width;
+                var height = ctx.canvas.height;
+                ctx.clearRect(0, 0, width, height);
+                for (var i = 0, pLen = pointes.length; i < pLen; i ++) {
+                    pointes[i].move();
+                    pointes[i].draw(ctx);
+                    var len = distance(pointes[i].x, pointes[i].y, _self.mX, _self.mY);
+                    if ( len < 150) {
+                        ctx.beginPath();
+                        ctx.lineWidth = 1 - len / 150;
+                        ctx.strokeStyle = pointes[i].color;
+                        ctx.moveTo(mX, mY);
+                        ctx.lineTo(pointes[i].x, pointes[i].y);
+                        ctx.closePath();
+                        ctx.stroke();
+                    }
+                }
+                for ( var i = 0, len = pointes.length; i < len; i++) {
+                    for (var j = i + 1, pLen = pointes.length; j < pLen; j++) {
+                        var len = distance(pointes[i].x, pointes[i].y, pointes[j].x, pointes[j].y);
+                        if ( len < 150) {
+                            ctx.beginPath();
+                            ctx.lineWidth = 1 - len / 150;
+                            ctx.strokeStyle = pointes[i].color;
+                            ctx.moveTo(pointes[j].x, pointes[j].y);
+                            ctx.lineTo(pointes[i].x, pointes[i].y);
+                            ctx.closePath();
+                            ctx.stroke();
+                        }
+                    }
+                }
+                // window.requestAnimationFrame(this.draw.bind(window, ctx, pointes));
+            },
+            initCanvas () {
+                const cvs = new Canvas();
+                cvs.insertInto(this.$refs.canvas);
+                var pointes = [];
+                var width = cvs.canvas.width;
+                var height = cvs.canvas.height;
+                console.log(width, height);
+                for (var i = 0; i < 0.0001 * width * height; i++) pointes.push(new Point(width, height));
+                cvs.canvas.addEventListener('mousemove', function (e) { window.mX = e.clientX; window.mY = e.clientY; });
+                // this.draw.call(window, cvs.context, pointes);
+            },
         },
         mounted () {
             const chart = this.$refs.chart;
             this.chart = echarts.init(chart);
+            this.initCanvas();
             // 测试api
             // this.getIndexTimeLine();
             // this.getIndexList();
@@ -304,12 +359,18 @@
     .main-list .active { background-color: #ffffff; }
     #sec-1 {
         display: flex;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
+        padding: 0;
+        position: relative;
+
+        canvas { position: absolute; z-index: 0; }
     }
     #sec-1 h1 {
         margin: 0;
+        z-index: 1;
         font-size: 100px;
+        position: relative;
         padding-bottom: 200px;
         box-sizing: border-box;
         text-shadow: 1px 1px 3px #ffffff, 2px 2px 7px #ffffff, 3px 3px 10px #ffffff, 5px 5px 15px #000000;
@@ -395,7 +456,6 @@
             }
         }
     }
-
     #sec-3 {}
     #sec-4 {
         h2 { font-size: 40px;  padding: 30px; }
