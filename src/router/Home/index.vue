@@ -297,7 +297,7 @@
                         }
                     }
                 }
-                // window.requestAnimationFrame(this.draw.bind(window, ctx, pointes));
+                window.requestAnimationFrame(this.draw.bind(window, ctx, pointes));
             },
             initCanvas () {
                 const cvs = new Canvas();
@@ -308,7 +308,7 @@
                 console.log(width, height);
                 for (var i = 0; i < 0.0001 * width * height; i++) pointes.push(new Point(width, height));
                 cvs.canvas.addEventListener('mousemove', function (e) { window.mX = e.clientX; window.mY = e.clientY; });
-                // this.draw.call(window, cvs.context, pointes);
+                this.draw.call(window, cvs.context, pointes);
             },
         },
         mounted () {
