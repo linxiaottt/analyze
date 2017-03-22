@@ -172,7 +172,6 @@ class Chart {
         };
     }
     getDefaultAxis () {}
-
     getDefaultDataZoom () {}
     getDefaultSeries () {}
 

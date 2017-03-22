@@ -3,7 +3,9 @@
         <div class = "main" :style = "{ top: -state.index * height + 'px' }">
             <section class = "section" id = "sec-1" ref = "canvas">
                 <h1>股票分析系统</h1>
-                <!-- <Search :result = "[]" :handleSubmit = "()=> {}"/> -->
+            </section>
+            <section class = "section" >
+                <Search :result = "[]" />
             </section>
             <section class = "section" id = "sec-2">
                 <div class = "sec-2-filter">
@@ -52,7 +54,6 @@
                 </div>
             </section>
             <section class = "section" id = "sec-3">
-
             </section>
             <section class = "section" id = "sec-4">
                 <h2>上证指数</h2>
@@ -60,9 +61,22 @@
             </section>
         </div>
         <div class = "main-list">
-                <a v-for = "(item, index) in newList(n)"
+            <a v-for = "(item, index) in newList(n)"
                 :class = "{ active: item === state.index }"
+                @click = "clicPagePoint(item)"
                 :key = "index"></a>
+        </div>
+        <div class = "main-slider">
+            <ul>
+                <a href="javascript:void(0)">股指列表查询</a>
+                <a href="javascript:void(0)">股指实时分时线查询</a>
+                <a href="javascript:void(0)">股票实时K线数据查询</a>
+                <a href="javascript:void(0)">股票实时分时线数据查询</a>
+                <a href="javascript:void(0)">沪深及港股历史行情查询</a>
+                <a href="javascript:void(0)">名称编码拼音查询股票信息查询</a>
+                <a href="javascript:void(0)">股票列表查询</a>
+                <a href="javascript:void(0)">沪深股票最新50条逐笔交易查询</a>
+            </ul>
         </div>
     </div>
 </template>
@@ -122,6 +136,10 @@
             }
         },
         methods: {
+            clicPagePoint (item) {
+                if (item === this.state.index) return ;
+                this.state.index = item;
+            },
             drawRealTimeK (data) {
                 const option = realTimeK;
                 let keys = Object.keys(data[0]);
@@ -135,7 +153,7 @@
                     values.push([list[1], list[3], list[0], list[2]]);
                 }
                 option.series[0].data = values;
-                option.series[1].data = volumns;console.l
+                option.series[1].data = volumns;
                 option.xAxis[0].data = option.xAxis[1].data = times;
                 this.chart.setOption(option);
             },
@@ -305,7 +323,6 @@
                 var pointes = [];
                 var width = cvs.canvas.width;
                 var height = cvs.canvas.height;
-                console.log(width, height);
                 for (var i = 0; i < 0.0001 * width * height; i++) pointes.push(new Point(width, height));
                 cvs.canvas.addEventListener('mousemove', function (e) { window.mX = e.clientX; window.mY = e.clientY; });
                 this.draw.call(window, cvs.context, pointes);
@@ -347,16 +364,36 @@
         align-items: center;
         flex-direction: column;
         justify-content: center;
+
+        a {
+            width: 10px;
+            height: 10px;
+            margin: 10px 0;
+            display: block;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 1px solid #ffffff;
+        }
+        .active { background-color: #ffffff; }
     }
-    .main-list a {
-        width: 10px;
-        height: 10px;
-        margin: 10px 0;
-        display: block;
-        border-radius: 50%;
-        border: 1px solid #ffffff;
+    .main-slider {
+        top: 0;
+        left: 0;
+        width: 0;
+        z-index: 1;
+        height: 100%;
+
+        font-size: 10px;
+        font-weight: 900;
+        max-width: 400px;
+        visibility: hidden;
+        position: absolute;
+        background: #ffffff;
+        box-sizing: border-box;
+        .active { width: 30%; min-width: 200px; visibility: visible; }
+        a { display: block; width: 100%; height: 30px; font-size: 2em; padding: 20px ; box-sizing: border-box; }
+        a.active { background: #ffffff; color: #000000; }
     }
-    .main-list .active { background-color: #ffffff; }
     #sec-1 {
         display: flex;
         align-items: center;
@@ -365,17 +402,17 @@
         position: relative;
 
         canvas { position: absolute; z-index: 0; }
+
+        h1 {
+            margin: 0;
+            z-index: 1;
+            font-size: 100px;
+            position: relative;
+            margin-top: -200px;
+            box-sizing: border-box;
+            text-shadow: 1px 1px 3px #ffffff, 2px 2px 7px #ffffff, 3px 3px 10px #ffffff, 5px 5px 15px #000000;
+        }
     }
-    #sec-1 h1 {
-        margin: 0;
-        z-index: 1;
-        font-size: 100px;
-        position: relative;
-        padding-bottom: 200px;
-        box-sizing: border-box;
-        text-shadow: 1px 1px 3px #ffffff, 2px 2px 7px #ffffff, 3px 3px 10px #ffffff, 5px 5px 15px #000000;
-    }
-    #sec-2 { box-sizing: border-box; }
 
     .sec-2-filter {
         margin: 40px 0 40px;

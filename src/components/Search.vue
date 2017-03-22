@@ -9,12 +9,15 @@
     <div class = "search-container">
         <div class = "search-item">
             <input type="text"
-                autofocus = "autofocus"
                 placeholder = "输入"
                 v-model = "content"
                 @input = "input"
                 @keydown.13 = "clickSubmit">
-            <a href = "javascript:void(0)" @click = "clickSubmit">click me</a>
+            <a href = "javascript:void(0)" @click = "clickSubmit">
+                <svg>
+                    <use xlink:href = "#icon-search"></use>
+                </svg>
+            </a>
         </div>
         <ul class = "search-relative" v-if = "result && result.length" :class="{ active: result && result.length }">
             <li
@@ -27,6 +30,7 @@
     </div>
 </template>
 <script>
+    import '../assets/home.js';
     export default {
         data () {
             return { content: ''};
@@ -47,29 +51,37 @@
                 if (!content.toString().trim().length) return console.log('请输入文字');
                 if (this.handleSubmit) return this.handleSubmit(content);
             },
+            timeout(callback, time) {
+                setTimeout(callback, time);
+            },
         },
     };
 </script>
 <style lang = "scss">
     .search-container {
         width: 70%;
+        display: block;
+        margin: 0 auto;
+        font-size: 10px;
         max-width: 800px;
         min-width: 200px;
-        margin: 0 auto;
-        position: absolute;
-        font-size: 10px;
-        .search-item {
-            display: flex;
-            height: 40px;
-            line-height: 40px;
-            font-size: 2em;
+        position: relative;
+        box-sizing: border-box;
 
-            input { outline: none; height: 100%; box-sizing: border-box; border: none; padding: 0; font-size: inherit; line-height: inherit; flex: 1 1 0;}
-            a { text-decoration: none; height: 100%;  box-sizing: border-box; line-height: inherit; flex: 1 1 1;}
+        .search-item {
+            font-size: 2em;
+            height: 40px;
+            display: flex;
+            line-height: 40px;
+
+            input { outline: none; height: 100%; box-sizing: border-box; border: none; padding: 0; font-size: inherit; line-height: inherit; flex: 1 1 0; padding: 5px 20px; }
+            a { text-decoration: none; height: 100%;  box-sizing: border-box; line-height: inherit; flex: 0 0 40px; background: #19B955; }
+            a svg { width: 100%; height: 100%; box-sizing: border-box; padding: 5px; }
             a:hover { color: #ffffff; background: #00ffff; }
         }
         .search-relative {
             width: 100%;
+            min-width: 100%;
             margin-top: 0;
             position: absolute;
             box-sizing: border-box;
@@ -81,11 +93,11 @@
             transition: all .6s ease-in-out;
 
             li {
+                cursor: pointer;
                 font-size: 1.6em;
                 padding: 5px 20px;
                 padding-left: 40px;
                 transition: all .6s ease-in-out;
-                cursor: pointer;
                 &:not(:first-child) { border-top: 1px solid #aeaeae; }
                 &:hover { color: #0a0a0a; background: #aeaeae; }
                 &.active { padding-left: 20px; }
