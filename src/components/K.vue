@@ -38,4 +38,10 @@
 		},
 	};
 </script>
-<style lang = "scss"></style>
+<style lang = "scss">
+	.k-container {
+		width: 100%;
+		height: 100%;
+		box-sizing: border-box;
+	}
+</style>

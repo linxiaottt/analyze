@@ -32,7 +32,7 @@
 
 	export default {
 		data () {
-			return {};
+			return { stockInfo: {}, realtime: {} };
 		},
 		components: { K },
 		filters: {
@@ -118,6 +118,7 @@
 		mounted () {
 			const { code } = this.$route.params;
 			this.getNameToStockInfo(code);
+			this.getRealStockInfo(code);
 		},
 	};
 </script>
