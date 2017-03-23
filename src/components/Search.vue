@@ -1,17 +1,21 @@
 <<!-->
     纯搜索组件
-    result [Array] input返回的结果
+    dropdown [Array] input返回的结果
     handleInput [Function] 输入时的回调函数
     handleSubmit [Function] 当点击提交时
     handleClickItem [Function] 点击待选栏
+    <Search :dropdown = "[]" :handleInput = "()=>{}" :handleSubmit = "()=>{}" :handleClickItem = "()=>{}" />
 </!-->
 <template>
     <div class = "search-container">
         <div class = "search-item">
-            <input type="text"
+            <input type = "text"
+            	ref = "input"
                 placeholder = "输入"
                 v-model = "content"
                 @input = "input"
+                @compositionstart = "compositionStart"
+                @compositionend = "compositionEnd"
                 @keydown.13 = "clickSubmit">
             <a href = "javascript:void(0)" @click = "clickSubmit">
                 <svg>
@@ -19,9 +23,10 @@
                 </svg>
             </a>
         </div>
-        <ul class = "search-relative" v-if = "result && result.length" :class="{ active: result && result.length }">
+        <ul class = "search-relative" v-if = "content" :class="{ active: true }">
+        	<li v-if = "content && dropdown && dropdown.length === 0">{{ `不存在为 ${ content } 的项` }}</li>
             <li
-                v-for = "(item, index) in result.slice(0, 5)"
+                v-for = "(item, index) in dropdown"
                 :key = "index"
                 class = "active"
                 @click = "clickItem(item)"
@@ -33,14 +38,14 @@
     import '../assets/home.js';
     export default {
         data () {
-            return { content: ''};
+            return { content: '', lockInput: false, };
         },
-        props: ['result', 'handleInput', 'handleClickSubmit'],
+        props: ['dropdown', 'handleInput', 'handleClickSubmit'],
         methods: {
             input () {
                 const { content } = this;
+                if (this.lockInput) return;
                 if (!content.toString().trim().length) return;
-                this.result.push({name: 'xxxx'});
                 if (this.handleInput) return this.handleInput(content);
             },
             clickItem (item) {
@@ -48,12 +53,15 @@
             },
             clickSubmit () {
                 const { content } = this;
+                if (this.lockInput) return;
                 if (!content.toString().trim().length) return console.log('请输入文字');
                 if (this.handleSubmit) return this.handleSubmit(content);
             },
             timeout(callback, time) {
                 setTimeout(callback, time);
             },
+            compositionStart () { this.lockInput = true; },
+            compositionEnd() { this.lockInput = false; }
         },
     };
 </script>

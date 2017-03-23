@@ -12,7 +12,13 @@
 		data () { return {
 			chart: null,
 		}; },
-		props: ['x', 'y', 'k', 'v']
+		props: ['x', 'y', 'k', 'v'],
+		watch: {
+			x () { this.draw(); },
+			y () { this.draw(); },
+			k () { this.draw(); },
+			v () { this.draw(); }
+		},
 		methods: {
             draw () {
             	const option = realTimeK;
