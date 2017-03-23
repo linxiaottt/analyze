@@ -2,23 +2,35 @@
 	<div class = "info-container">
 		<div class = "info-main">
 			<ul class = "info-short">
-				<div>股票基本信息</div>
-				<li v-for = "(value, key, index) in stockInfo" :key = "index">
-					<span class = "info-stock-key"> {{ key | stockKeyFilter }}</span>
+				<div class = "info-title">股票基本信息</div>
+				<li v-for = "(value, key, index) in stockInfo" :key = "index" v-if = "value.length">
+					<span class = "info-stock-key"> {{ key | stockKeyFilter }} : </span>
 					<span class = "info-stock-value"> {{ value }}</span>
 				</li>
+<!-- 				<li><span class = "info-stock-key">testKey:</span><span class = "info-stock-value">testValue</span></li>
+				<li><span class = "info-stock-key">testKey:</span><span class = "info-stock-value">testValue</span></li>
+				<li><span class = "info-stock-key">testKey:</span><span class = "info-stock-value">testValue</span></li>
+				<li><span class = "info-stock-key">testKey:</span><span class = "info-stock-value">testValue</span></li>
+				<li><span class = "info-stock-key">testKey:</span><span class = "info-stock-value">testValue</span></li>
+				<li><span class = "info-stock-key">testKey:</span><span class = "info-stock-value">testValue</span></li> -->
 			</ul>
-			<div class = "info-k">
+			<div class = "info-k" >
+				<div class = "info-title" v-if = "false">K线图</div>
 				<K />
 			</div>
 		</div>
 		<div class = "info-side">
-			<div>股票实时行情</div>
+			<div class = "info-title">股票实时行情</div>
 			<ul>
-				<li v-for = "(value, key, index) in realtime" :key = "index">
-					<span class = "info-real-key"> {{ key | realtimeFilter }}</span>
-					<span class = "info-real-value">{{ value }}</span>
+				<li v-for = "(value, key, index) in realtime" :key = "index" >
+					<span class = "info-realtime-key"> {{ key | realtimeKeyFilter }} : </span>
+					<span class = "info-realtime-value">{{ value }}</span>
 				</li>
+				<!-- <li><span class = "info-realtime-key">testKey:</span><span class = "info-realtime-value">testValue</span></li>
+				<li><span class = "info-realtime-key">testKey:</span><span class = "info-realtime-value">testValue</span></li>
+				<li><span class = "info-realtime-key">testKey:</span><span class = "info-realtime-value">testValue</span></li>
+				<li><span class = "info-realtime-key">testKey:</span><span class = "info-realtime-value">testValue</span></li>
+				<li><span class = "info-realtime-key">testKey:</span><span class = "info-realtime-value">testValue</span></li> -->
 			</ul>
 		</div>
 	</div>
@@ -34,11 +46,29 @@
 		data () {
 			return { stockInfo: {}, realtime: {} };
 		},
+		watch: {
+			nameToStockInfo (value) {
+				const data = value instanceof Array ? value[0] : value;
+				this.stockInfo = data;
+			},
+			realStockInfo (value) {
+				const data = value instanceof Array ? value[0] : value;
+				this.realtime = data;
+			},
+
+		},
+		computed: {
+			...mapState([
+				'realStockInfo',
+				'nameToStockInfo',
+			]),
+		},
 		components: { K },
 		filters: {
 			stockKeyFilter (value) {
 				switch (value) {
 					case 'market': return '市场';
+					case 'state': return '股票状态';
 					case 'name': return '股票名称';
 					case 'code': return '股票代码';
 					case 'pinyin': return '拼音简写';
@@ -49,7 +79,7 @@
 					default: return value;
 				};
 			},
-			realtimeFilter (value) {
+			realtimeKeyFilter (value) {
 				switch (value) {
 					case 'todayMax': return '今日最高价';
 					case 'highLimit': return '涨停价';
@@ -132,6 +162,9 @@
 		padding: 20px;
 		box-sizing: border-box;
 
+		color: #ffffff;
+		font-size: 10px;
+
 		.info-main {
 			display: flex;
 			flex: 1 1 75%;
@@ -151,4 +184,38 @@
 		}
 	}
 	.border { border: 1px solid #ffffff; border-radius: 4px; }
+
+	 /*区块处理*/
+	 .info-title { width: 100%; box-sizing: border-box; text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+	.info-short {
+		font-size: 0;
+		li {
+			width: 50%;
+			font-size: 16px;
+			padding: 5px 20px;
+			display: inline-block;
+			box-sizing: border-box;
+			&:nth-of-type(2n + 1) { border-right: 1px solid #218ad2; }
+			&:nth-of-type(4n + 1), &:nth-of-type(4n + 2)  { background-color: #ffffff; color: #000000; };
+		}
+		.info-stock-key { color: #ea912e; font-weight: 600; display: inline-block; width: 30%; box-sizing: border-box; padding-left: 10%; }
+		.info-stock-value { display: inline-block;  width: 70%; box-sizing: border-box; }
+	}
+	.info-k {}
+	.info-side {
+		ul {}
+		li {
+			display: block;
+			padding: 5px 20px;
+			box-sizing: border-box;
+			&:nth-of-type(2n + 1) { background-color: #ffffff; color: #000000; };
+		}
+		.info-realtime-key { color: #ea912e; font-weight: 600; display: inline-block; width: 30%; box-sizing: border-box; }
+		.info-realtime-value { display: inline-block;  width: 70%; box-sizing: border-box; }
+	}
+	@media all and (max-width: 512px) {
+		.info-short {
+			li { display: block; width: 100%; &:nth-child(2n + 1) { margin-left: 0px; } }
+		}
+	}
 </style>
