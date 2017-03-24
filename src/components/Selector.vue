@@ -21,7 +21,7 @@
 	<script>
 		export default {
 			data () { return { value: '' }; },
-			props: ['options', 'placeholder' ],
+			props: ['options', 'placeholder', 'handleClickOption'],
 			methods: {
 				clickOption (item) {
 					this.value = item;

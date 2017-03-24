@@ -11,7 +11,9 @@
 			<div class = "info-k" >
 				<div class = "info-title" v-if = "false">K线图</div>
 				<div class = "info-k-control">
-					<Datepicker language = "zh" v-model = "beginDay" format ="yyyyMMdd" placeholder = "请输入开始日期"/>
+					<div>
+						<Datepicker language = "zh" v-model = "beginDay" format ="yyyyMMdd" placeholder = "请输入开始日期"/>
+					</div>
 					<div>
 						<Selector :options = "timeList | timeListFilter(stockInfo)" placeholder = "分时线" :handleClickOption = "clickFS"/>
 					</div>
@@ -51,7 +53,7 @@
 				y: [],
 				k: [],
 				v: [],
-			}, state: { fs: '', fq: '', }, fqList : ['不复权', '前复权'], timeList: ['5', '30', '60', 'day', 'week', 'month'] };
+			}, state: { fs: '', fq: '', beginDay: ''}, fqList : ['不复权', '前复权'], timeList: ['5', '30', '60', 'day', 'week', 'month'] };
 		},
 		watch: {
 			nameToStockInfo (value) {
@@ -174,20 +176,28 @@
 			},
 			getRealTimeK ({ code, beginDay, time, type }) {
 				const query = {};
-
-				beginDay = '20170210';
-				time = 'week'; // '5' || '30' || '60' || 'day' || 'week' || 'month'
-				type = 'bfq'; // 'bfq' || 'qfq'
-				this.publish(STOCK.STOCK_REALTIME_K.name, { query: { beginDay, code, time, type }});
+				if (type) query.type = type;
+				if (time) query.time = time;
+				if (code) query.code = code;
+				if (beginDay) query.beginDay = beginDay;
+				// beginDay '20170210';
+				// type  'bfq' || 'qfq';
+				// time  '5' || '30' || '60' || 'day' || 'week' || 'month';
+				this.publish(STOCK.STOCK_REALTIME_K.name, { query });
 			},
-			clickFQ (value) { this.state.fq = value; },
-			clickFS (value) { this.state.fs = value; },
+			queryRealTimeK () {
+				const { code } = this.$route.params;
+				const { fq, fs, beginDay } = this.state;
+				this.getRealTimeK({ code, time: fs, type: fq, beginDay });
+			},
+			clickFQ (value) { this.state.fq = value; this.queryRealTimeK(); },
+			clickFS (value) { console.log(value); this.state.fs = value; this.queryRealTimeK(); },
 		},
 		mounted () {
 			const { code } = this.$route.params;
 			this.getNameToStockInfo(code);
 			this.getRealStockInfo(code);
-			this.getRealTimeK({ code, });
+			this.getRealTimeK({ code });
 		},
 	};
 </script>
@@ -247,11 +257,14 @@
 		.info-k-control {
 			display: flex;
 			color: #000000;
-			box-sizing: border-box;
-			margin-bottom: 10px;
 			flex: 0 0 auto;
+			margin: 5px 0 10px;
+			box-sizing: border-box;
+			justify-content: flex-end;
+
+			& > div { position: relative; padding: 0 5px; box-sizing: border-box; }
 		}
-		.info-k-container { height: 100%;}
+		.info-k-container { height: 100%; }
 	}
 	.info-side {
 		ul {}
