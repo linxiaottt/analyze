@@ -8,11 +8,11 @@
 	<div class = "selector-container">
 		<div class = "drop-down">
 			<span>
-				{{ value || placeholder }}
+				{{ value || placeholder || '请选择' }}
 			</span>
 			<ul>
-				<li v-for = "(item, index) in options" :key = "index" @click = "clickOption(item)">
-					{{ item }}
+				<li v-for = "(item, index) in opts" :key = "index" @click = "clickOption(item)">
+					{{ item.name }}
 				</li>
 			</ul>
 		</div>
@@ -24,19 +24,18 @@
 			props: ['options', 'placeholder', 'handleClickOption'],
 			methods: {
 				clickOption (item) {
-					this.value = item;
-					if (this.handleClickOption) return this.handleClickOption(item);
+					this.value = item.name;
+					if (this.handleClickOption) return this.handleClickOption(item.value);
 				},
 			},
 			computed: {
-				innerValue () {
-					return this.value;
-				},
-				defaultValue () {
-					const { placeholder } = this;
-					if (Number.parseInt(placeholder)) return this.options[placeholder];
-					else if (placeholder) return placeholder;
-					return '';
+				opts () {
+					let { options } = this;
+					if (!(options && options instanceof Array)) return options;
+					if (options[0] && (typeof options[0] === 'string' || typeof options[0] === 'number')) {
+						options = options.map( item => ({ name: item, value: item }));
+					}
+					return options;
 				},
 			},
 		};

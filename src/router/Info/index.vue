@@ -12,13 +12,14 @@
 				<div class = "info-title" v-if = "false">K线图</div>
 				<div class = "info-k-control">
 					<div>
-						<Datepicker language = "zh" v-model = "beginDay" format ="yyyyMMdd" placeholder = "请输入开始日期"/>
+						<Datepicker language = "zh" format ="yyyyMMdd"
+						placeholder = "请输入开始日期" v-on:selected = "clickDate"/>
 					</div>
 					<div>
 						<Selector :options = "timeList | timeListFilter(stockInfo)" placeholder = "分时线" :handleClickOption = "clickFS"/>
 					</div>
 					<div>
-						<Selector :options = "['不复权', '前分权']" placeholder = "复权方式" :handleClickOption = "clickFQ"/>
+						<Selector :options = "fqList" placeholder = "复权方式" :handleClickOption = "clickFQ"/>
 					</div>
 				</div>
 				<div class = "info-k-container">
@@ -48,12 +49,29 @@
 
 	export default {
 		data () {
-			return { stockInfo: {}, realtime: {}, beginDay: '',k: {
-				x: [],
-				y: [],
-				k: [],
-				v: [],
-			}, state: { fs: '', fq: '', beginDay: ''}, fqList : ['不复权', '前复权'], timeList: ['5', '30', '60', 'day', 'week', 'month'] };
+			return {
+				stockInfo: {},
+				realtime: {},
+				k: {
+					x: [],
+					y: [],
+					k: [],
+					v: [],
+				},
+				state:{
+					fs: '',
+					fq: '',
+					beginDay: ''
+				},
+				fqList : [{
+					name: '不复权',
+					value: 'bfq'
+				}, {
+					name: '前复权',
+					value: 'qfq'
+				}],
+				timeList: ['5', '30', '60', 'day', 'week', 'month']
+			};
 		},
 		watch: {
 			nameToStockInfo (value) {
@@ -190,8 +208,18 @@
 				const { fq, fs, beginDay } = this.state;
 				this.getRealTimeK({ code, time: fs, type: fq, beginDay });
 			},
+			filterDate (date) {
+				let day = date.getDate() + '';
+				let month = date.getMonth() + 1 + '';
+				const year = date.getFullYear() + '';
+
+				day = day.length === 1 ? '0' + day : day;
+				month = month.length === 1 ? '0' + month : month;
+				return `${year}${month}${day}`;
+			},
 			clickFQ (value) { this.state.fq = value; this.queryRealTimeK(); },
-			clickFS (value) { console.log(value); this.state.fs = value; this.queryRealTimeK(); },
+			clickFS (value) { this.state.fs = value; this.queryRealTimeK(); },
+			clickDate (value) { this.state.beginDay = this.filterDate(value); this.queryRealTimeK(); },
 		},
 		mounted () {
 			const { code } = this.$route.params;
