@@ -7,16 +7,21 @@
 					<span class = "info-stock-key"> {{ key | stockKeyFilter }} : </span>
 					<span class = "info-stock-value"> {{ value }}</span>
 				</li>
-<!-- 				<li><span class = "info-stock-key">testKey:</span><span class = "info-stock-value">testValue</span></li>
-				<li><span class = "info-stock-key">testKey:</span><span class = "info-stock-value">testValue</span></li>
-				<li><span class = "info-stock-key">testKey:</span><span class = "info-stock-value">testValue</span></li>
-				<li><span class = "info-stock-key">testKey:</span><span class = "info-stock-value">testValue</span></li>
-				<li><span class = "info-stock-key">testKey:</span><span class = "info-stock-value">testValue</span></li>
-				<li><span class = "info-stock-key">testKey:</span><span class = "info-stock-value">testValue</span></li> -->
 			</ul>
 			<div class = "info-k" >
 				<div class = "info-title" v-if = "false">K线图</div>
-				<K />
+				<div class = "info-k-control">
+					<Datepicker language = "zh" v-model = "beginDay" format ="yyyyMMdd" placeholder = "请输入开始日期"/>
+					<div>
+						<Selector :options = "timeList | timeListFilter(stockInfo)" placeholder = "分时线" :handleClickOption = "clickFS"/>
+					</div>
+					<div>
+						<Selector :options = "['不复权', '前分权']" placeholder = "复权方式" :handleClickOption = "clickFQ"/>
+					</div>
+				</div>
+				<div class = "info-k-container">
+					<K :k = "k.k" :v = "k.v" :x = "k.x" />
+				</div>
 			</div>
 		</div>
 		<div class = "info-side">
@@ -26,25 +31,27 @@
 					<span class = "info-realtime-key"> {{ key | realtimeKeyFilter }} : </span>
 					<span class = "info-realtime-value">{{ value }}</span>
 				</li>
-				<!-- <li><span class = "info-realtime-key">testKey:</span><span class = "info-realtime-value">testValue</span></li>
-				<li><span class = "info-realtime-key">testKey:</span><span class = "info-realtime-value">testValue</span></li>
-				<li><span class = "info-realtime-key">testKey:</span><span class = "info-realtime-value">testValue</span></li>
-				<li><span class = "info-realtime-key">testKey:</span><span class = "info-realtime-value">testValue</span></li>
-				<li><span class = "info-realtime-key">testKey:</span><span class = "info-realtime-value">testValue</span></li> -->
 			</ul>
 		</div>
 	</div>
 </template>
 <script>
+	import Datepicker from 'vuejs-datepicker';
 	import { mapState, mapGetters } from 'vuex';
 
 	import K from '../../components/K';
+	import Selector from '../../components/Selector';
+
 	import { STOCK } from '../../common/constants';
-	import { realTimeK } from '../../common/echart-stock';
 
 	export default {
 		data () {
-			return { stockInfo: {}, realtime: {} };
+			return { stockInfo: {}, realtime: {}, beginDay: '',k: {
+				x: [],
+				y: [],
+				k: [],
+				v: [],
+			}, state: { fs: '', fq: '', }, fqList : ['不复权', '前复权'], timeList: ['5', '30', '60', 'day', 'week', 'month'] };
 		},
 		watch: {
 			nameToStockInfo (value) {
@@ -55,16 +62,37 @@
 				const data = value instanceof Array ? value[0] : value;
 				this.realtime = data;
 			},
-
+			realTimeK (value) {
+				let keys = Object.keys(value[0]);
+				let values = [], times = [], volumns = [];
+				let timeIndex = keys.findIndex(item => item === 'time');
+				let volumnIndex = keys.findIndex(item => item === 'volumn');
+				for (const item of value) {
+					const list = Object.values(item);
+					times.push(list.splice(timeIndex, 1)[0]);
+					volumns.push(list.splice(volumnIndex, 1)[0]);
+					values.push([list[1], list[3], list[0], list[2]]);
+				}
+				this.k.x = times;
+				this.k.k = values;
+				this.k.v = volumns;
+			},
 		},
 		computed: {
 			...mapState([
+				'realTimeK',
 				'realStockInfo',
 				'nameToStockInfo',
 			]),
 		},
-		components: { K },
+		components: { K, Datepicker, Selector },
 		filters: {
+			timeListFilter (value, stockInfo) {
+				const market = 'hk';
+				const black = ['5', '30', '60'];
+				if (stockInfo && stockInfo.market !== market) return value;
+				return value.filter( item => !(item in black));
+			},
 			stockKeyFilter (value) {
 				switch (value) {
 					case 'market': return '市场';
@@ -144,11 +172,22 @@
 				const needKPic = 0; // 0 || 1;
 				this.publish(STOCK.STOCK_REAL_STOCK_INFO.name, { query: { code, needIndex, need_k_pic: needKPic}});
 			},
+			getRealTimeK ({ code, beginDay, time, type }) {
+				const query = {};
+
+				beginDay = '20170210';
+				time = 'week'; // '5' || '30' || '60' || 'day' || 'week' || 'month'
+				type = 'bfq'; // 'bfq' || 'qfq'
+				this.publish(STOCK.STOCK_REALTIME_K.name, { query: { beginDay, code, time, type }});
+			},
+			clickFQ (value) { this.state.fq = value; },
+			clickFS (value) { this.state.fs = value; },
 		},
 		mounted () {
 			const { code } = this.$route.params;
 			this.getNameToStockInfo(code);
 			this.getRealStockInfo(code);
+			this.getRealTimeK({ code, });
 		},
 	};
 </script>
@@ -186,32 +225,45 @@
 	.border { border: 1px solid #ffffff; border-radius: 4px; }
 
 	 /*区块处理*/
-	 .info-title { width: 100%; box-sizing: border-box; text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+	 .info-title { width: 100%; box-sizing: border-box; text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
 	.info-short {
 		font-size: 0;
 		li {
 			width: 50%;
 			font-size: 16px;
-			padding: 5px 20px;
+			padding: 2px 20px;
+			white-space: nowrap;
 			display: inline-block;
 			box-sizing: border-box;
 			&:nth-of-type(2n + 1) { border-right: 1px solid #218ad2; }
 			&:nth-of-type(4n + 1), &:nth-of-type(4n + 2)  { background-color: #ffffff; color: #000000; };
 		}
-		.info-stock-key { color: #ea912e; font-weight: 600; display: inline-block; width: 30%; box-sizing: border-box; padding-left: 10%; }
-		.info-stock-value { display: inline-block;  width: 70%; box-sizing: border-box; }
+		.info-stock-key { color: #ea912e; font-weight: 600; display: inline-block;  box-sizing: border-box; padding-left: 10%; }
+		.info-stock-value { display: inline-block;  box-sizing: border-box; }
 	}
-	.info-k {}
+	.info-k {
+		display: flex;
+		flex-direction: column;
+		.info-k-control {
+			display: flex;
+			color: #000000;
+			box-sizing: border-box;
+			margin-bottom: 10px;
+			flex: 0 0 auto;
+		}
+		.info-k-container { height: 100%;}
+	}
 	.info-side {
 		ul {}
 		li {
 			display: block;
 			padding: 5px 20px;
 			box-sizing: border-box;
+			white-space: nowrap;
 			&:nth-of-type(2n + 1) { background-color: #ffffff; color: #000000; };
 		}
-		.info-realtime-key { color: #ea912e; font-weight: 600; display: inline-block; width: 30%; box-sizing: border-box; }
-		.info-realtime-value { display: inline-block;  width: 70%; box-sizing: border-box; }
+		.info-realtime-key { color: #ea912e; font-weight: 600; display: inline-block;box-sizing: border-box; }
+		.info-realtime-value { display: inline-block; box-sizing: border-box; }
 	}
 	@media all and (max-width: 512px) {
 		.info-short {

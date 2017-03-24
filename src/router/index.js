@@ -12,8 +12,8 @@ export default new Router({
 		name: 'Home',
 		component: r => require.ensure([], () => r(require('./Home/index.vue')), 'Home')
 	}, {
-		path: '/info/:code',
-		name: 'Info',
-		component: r => require.ensure([], () => r(require('./Info/index.vue')), 'Info')
+		path: '/stock/:code',
+		name: 'Stock',
+		component: r => require.ensure([], () => r(require('./Info/index.vue')), 'Stock')
 	}]
 });

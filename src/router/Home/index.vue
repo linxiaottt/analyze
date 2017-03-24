@@ -4,13 +4,14 @@
 			<section class = "section" id = "sec-1" ref = "canvas">
 				<h1>股票分析系统</h1>
 			</section>
-			<section class = "section" >
-				<Search
-					:dropdown = "nameToStockInfoDropdown"
-					:handleInput = "nameToStockInfoSubmit"
-					:handleSubmit = "nameToStockInfoSubmit"
-					:handleClickItem = "nameToStockInfoClickItem" />
-				<K />
+			<section class = "section" id = "sec-0">
+				<div class = "section-2-search">
+					<Search
+						:dropdown = "nameToStockInfoDropdown"
+						:handleInput = "nameToStockInfoSubmit"
+						:handleSubmit = "nameToStockInfoSubmit"
+						:handleClickItem = "nameToStockInfoClickItem" />
+				</div>
 			</section>
 			<section class = "section" id = "sec-2">
 				<div class = "sec-2-filter">
@@ -60,10 +61,6 @@
 			</section>
 			<section class = "section" id = "sec-3">
 			</section>
-			<section class = "section" id = "sec-4">
-				<h2>上证指数</h2>
-				<div id = "chart" ref = "chart"></div>
-			</section>
 		</div>
 		<div class = "main-list">
 			<a v-for = "(item, index) in newList(n)"
@@ -86,24 +83,21 @@
 	</div>
 </template>
 <script>
-	import echarts from 'echarts';
-	import fetch from 'node-fetch';
+
 	import { mapState, mapGetters } from 'vuex';
 
-	import K from '../../components/K';
 	import Page from '../../components/Page';
 	import Search from '../../components/Search';
 	import MyTable from '../../components/MyTable';
 
 	import { STOCK } from '../../common/constants';
-	import { realTimeK } from '../../common/echart-stock';
 
 	import Canvas from './Canvas';
 	import Point, { distance } from './Point';
 	export default {
 		data () {
 			return {
-				n: 5, // 总共的页数
+				n: 4, // 总共的页数
 				page: 1, // 当前页
 				numPerPage: 10, // 每页最多显示10条数据
 				chart: null,
@@ -139,12 +133,7 @@
 				'nameToStockInfoDropdown',
 			]),
 		},
-		components: { K, Page, MyTable, Search },
-		watch: {
-			realTimeK (data) {
-				this.drawRealTimeK(data);
-			}
-		},
+		components: { Page, MyTable, Search },
 		methods: {
 			nameToStockInfoSubmit (content) {
 				if (this.checkLoading('loadingNameToStockInfo')) return ;
@@ -162,23 +151,6 @@
 			clicPagePoint (item) {
 				if (item === this.state.index) return ;
 				this.state.index = item;
-			},
-			drawRealTimeK (data) {
-				const option = realTimeK;
-				let keys = Object.keys(data[0]);
-				let values = [], times = [], volumns = [];
-				let timeIndex = keys.findIndex(item => item === 'time');
-				let volumnIndex = keys.findIndex(item => item === 'volumn');
-				for (const item of data) {
-					const list = Object.values(item);
-					times.push(list.splice(timeIndex, 1)[0]);
-					volumns.push(list.splice(volumnIndex, 1)[0]);
-					values.push([list[1], list[3], list[0], list[2]]);
-				}
-				option.series[0].data = values;
-				option.series[1].data = volumns;
-				option.xAxis[0].data = option.xAxis[1].data = times;
-				this.chart.setOption(option);
 			},
 			handleMouseWheel (event) {
 				if (this.state.isTurning) return;
@@ -360,7 +332,6 @@
 		},
 		mounted () {
 			const chart = this.$refs.chart;
-			this.chart = echarts.init(chart);
 			this.initCanvas();
 			// 测试api
 			// this.getIndexTimeLine();
@@ -447,12 +418,7 @@
 	.sec-2-filter {
 		margin: 40px 0 40px;
 		position: relative;
-		&:after {
-			content: '.';
-			font-size: 0;
-			display: block;
-			clear: both;
-		}
+
 		.drop-down {
 			width: 128px;
 			height: 40px;

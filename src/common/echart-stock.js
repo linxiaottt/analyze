@@ -84,7 +84,7 @@ export const realTimeK = {
     dataZoom: [{
         type: 'inside',
         xAxisIndex: [0, 1],
-        start: 90,
+        start: 0,
         end: 100
     }, {
         show: true,

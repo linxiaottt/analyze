@@ -1,6 +1,7 @@
 <<!-->
     纯搜索组件
     dropdown [Array] input返回的结果
+    placeholder [String] placeholader
     handleInput [Function] 输入时的回调函数
     handleSubmit [Function] 当点击提交时
     handleClickItem [Function] 点击待选栏
@@ -11,7 +12,7 @@
         <div class = "search-item">
             <input type = "text"
             	ref = "input"
-                placeholder = "输入"
+                :placeholder = "placeholader || '输入点什么吧'"
                 v-model = "content"
                 @input = "input"
                 @compositionstart = "compositionStart"
