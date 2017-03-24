@@ -5,7 +5,7 @@
 				<h1>股票分析系统</h1>
 			</section>
 			<section class = "section" id = "sec-0">
-				<div class = "section-2-search">
+				<div class = "section-search">
 					<Search
 						:dropdown = "nameToStockInfoDropdown"
 						:handleInput = "nameToStockInfoSubmit"
@@ -147,7 +147,12 @@
 				else return;
 				this.getNameToStockInfo(query);
 			},
-			nameToStockInfoClickItem (item) {},
+			nameToStockInfoClickItem (item) {
+				const { code } = item;
+				const path = `/stock/${code}`;
+				this.$router.push(path);
+
+			},
 			clicPagePoint (item) {
 				if (item === this.state.index) return ;
 				this.state.index = item;
@@ -414,7 +419,9 @@
 			text-shadow: 1px 1px 3px #ffffff, 2px 2px 7px #ffffff, 3px 3px 10px #ffffff, 5px 5px 15px #000000;
 		}
 	}
-
+	.section-search {
+		margin-top: 20px;
+	}
 	.sec-2-filter {
 		margin: 40px 0 40px;
 		position: relative;
