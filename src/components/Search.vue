@@ -41,7 +41,7 @@
         data () {
             return { content: '', lockInput: false, };
         },
-        props: ['dropdown', 'handleInput', 'handleClickSubmit'],
+        props: ['dropdown', 'placeholader', 'handleInput', 'handleClickSubmit', 'handleClickItem'],
         methods: {
             input () {
                 const { content } = this;
