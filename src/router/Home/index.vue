@@ -1,5 +1,6 @@
 <template>
 	<div class = "home-container">
+		<Navigator />
 		<div class = "main" :style = "{ top: -state.index * height + 'px' }">
 			<section class = "section" id = "sec-1" ref = "canvas">
 				<h1>股票分析系统</h1>
@@ -94,6 +95,9 @@
 
 	import Canvas from './Canvas';
 	import Point, { distance } from './Point';
+
+	import Navigator from '../../components/Navigator';
+
 	export default {
 		data () {
 			return {
@@ -133,14 +137,14 @@
 				'nameToStockInfoDropdown',
 			]),
 		},
-		components: { Page, MyTable, Search },
+		components: { Page, MyTable, Search, Navigator },
 		methods: {
 			nameToStockInfoSubmit (content) {
 				if (this.checkLoading('loadingNameToStockInfo')) return ;
 				const query = {};
 				const numReg = /^[0-9]{3,6}$/;
 				const pinyinReg = /^[a-zA-Z]{1, 8}$/;
-				const chineseReg = /[\u4E00-\u9FA5]/;
+				const chineseReg = /[\u4E00-\u9FA5]/g;
 				if (numReg.test(content)) query.code = content;
 				else if (pinyinReg.test(content)) query.pinyin = content;
 				else if (chineseReg.test(content)) query.name = content;

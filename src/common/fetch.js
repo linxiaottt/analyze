@@ -13,7 +13,7 @@ export default async function FETCH (path, options = {}) {
     if (query && query instanceof Object) path = `${path}?` + qs.stringify(query);
 
     config.method = method;
-    config.headers = { ...header, 'Authorization': 'APPCODE 2a9cbf8f1cea41ce98fb79463fca656c' };
+    config.headers = { ...header, 'Authorization': 'APPCODE f994ec0219f049799e312fc9c63bcb25' };
     // 产生错误执行的函数
     error = typeof error === 'function'? error: () => {};
     // 无论如何 最终都会执行的函数
