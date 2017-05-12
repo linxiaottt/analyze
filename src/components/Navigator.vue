@@ -11,12 +11,14 @@
 			<el-menu-item index="3">收藏</el-menu-item>
 			<el-menu-item class = "navigator-buttons " index = "4">
 				<el-button @click = "handleClickRegister">注册</el-button>
-				<el-button @click = "handleClickLoigin">登录</el-button>
+				<el-button @click = "handleClickLogin">登录</el-button>
 			</el-menu-item>
 		</el-menu>
 	</div>
 </template>
 <script>
+	import PUBSUB from 'pubsub-js';
+
 	export default {
 		data() {
 			return {
@@ -26,13 +28,12 @@
 		},
 		methods: {
 			handleSelect(key, keyPath) {
-				console.log(key, keyPath);
 			},
-			handleClickLoigin () {
-				console.log(1);
+			handleClickLogin () {
+				PUBSUB.publish('login-show', "login");
 			},
 			handleClickRegister () {
-				console.log(0);
+				PUBSUB.publish('login-show', "register");
 			},
 		}
 	};

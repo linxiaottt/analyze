@@ -15,19 +15,20 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click = "clickCancel">取 消</el-button>
-				<el-button type="primary" @click = "clickSubmit">确 定</el-button>
+				<el-button type="primary" @click = "clickSubmit" v-loading.lock = "isLoading">确 定</el-button>
 			</div>
 		</el-dialog>
 	</div>
 </template>
 <script>
+	import PUBSUB from 'pubsub-js';
 	import { USER } from '../common/constants';
-
 	export default {
 		data() {
 			return {
 				curTab: "login", // login || register
-				dialogVisible: true,
+				isLoading: false,
+				dialogVisible: false,
 				form: {
 					username: '',
 					password: '',
@@ -39,25 +40,41 @@
 				this.curTab = component.name;
 			},
 			clickSubmit () {
-				if (this.curTab === 'login') return this.register();
+				this.isLoading = true;
+				if (this.curTab === 'register') return this.register();
 				else return this.login();
 			},
 			clickCancel () {
-				this.dialogVisible = false;
+				return this.hide();
 			},
 			login () {
 				const { name } = USER.USER_REGISTER;
-				this.publish(name, { data: this.form });
+				const final = () => { this.isLoading = false; };
+				this.publish(name, { data: this.form, final });
 			},
 			register () {
 				const { name } = USER.USER_LOGIN;
-				this.publish(name, { data: this.form });
+				const final = () => { this.isLoading = false; };
+				this.publish(name, { data: this.form, final });
 			},
 			publish (type, payload) {
 				const { dispatch } = this.$store;
 				dispatch({ ... payload, type });
 			},
+			show (type, name) {
+				this.curTab = name;
+				this.dialogVisible = true;
+			},
+			hide (type, name) {
+				this.dialogVisible = false;
+			}
 		},
+		mounted () {
+			PUBSUB.subscribe('login-show', this.show.bind(this));
+		},
+		beforeDesotry () {
+			PUBSUB.unsubscribe('login-show', this.show);
+		}
 	};
 </script>
 <style lang = "scss">
