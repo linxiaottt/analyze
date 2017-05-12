@@ -81,6 +81,7 @@
 				<a href="javascript:void(0)">沪深股票最新50条逐笔交易查询</a>
 			</ul>
 		</div>
+		<Login />
 	</div>
 </template>
 <script>
@@ -96,6 +97,7 @@
 	import Canvas from './Canvas';
 	import Point, { distance } from './Point';
 
+	import Login from '../../components/Login';
 	import Navigator from '../../components/Navigator';
 
 	export default {
@@ -137,7 +139,7 @@
 				'nameToStockInfoDropdown',
 			]),
 		},
-		components: { Page, MyTable, Search, Navigator },
+		components: { Page, MyTable, Search, Navigator, Login },
 		methods: {
 			nameToStockInfoSubmit (content) {
 				if (this.checkLoading('loadingNameToStockInfo')) return ;

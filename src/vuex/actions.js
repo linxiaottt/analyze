@@ -1,5 +1,5 @@
 import fetch from '../common/fetch';
-import { STOCK } from '../common/constants';
+import { STOCK, USER } from '../common/constants';
 
 export default {
     [STOCK.STOCK_INDEX_SEARCH.name] ({ commit }, payload) {
@@ -62,4 +62,14 @@ export default {
         const { path, method } = STOCK[type];
         fetch(path, { ...payload, commit, method });
     },
+    [USER.USER_REGISTER.name] ({ commit }, payload) {
+		const { type } = payload;
+		const { path, method } = USER[type];
+		fetch(path, { ...payload, commit, method });
+	},
+	[USER.USER_LOGIN.name] ({ commit }, payload) {
+		const { type } = payload;
+		const { path, method } = USER[type];
+		fetch(path, { ...payload, commit, method });
+	}
 };

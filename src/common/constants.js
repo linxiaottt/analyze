@@ -72,3 +72,16 @@ export const STOCK = {
         "path": "http://ali-stock.showapi.com/everytrade"
     }
 };
+
+export const USER = {
+	"USER_REGISTER": {
+		"method": "POST",
+		"name": "USER_REGISTER",
+		"path": "/user/register"
+	},
+	"USER_LOGIN": {
+		"method": "POST",
+		"name": "USER_LOGIN",
+		"path": "/user/login"
+	}
+};

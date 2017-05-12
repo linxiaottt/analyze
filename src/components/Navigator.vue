@@ -1,36 +1,22 @@
 <template>
 	<div class = "navigator-container">
-		<el-menu theme="dark" :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-			<el-menu-item index="1">处理中心</el-menu-item>
+		<el-menu theme="dark" :default-active="activeIndex" class = "navigator-tabs" mode="horizontal" @select="handleSelect">
+			<el-menu-item index="1">主页</el-menu-item>
 			<el-submenu index="2">
-				<template slot="title">我的工作台</template>
+				<template slot="title">子菜单</template>
 				<el-menu-item index="2-1">选项1</el-menu-item>
 				<el-menu-item index="2-2">选项2</el-menu-item>
 				<el-menu-item index="2-3">选项3</el-menu-item>
 			</el-submenu>
-			<el-menu-item index="3"><a href="https://www.ele.me" target="_blank">订单管理</a></el-menu-item>
-		</el-menu>
-		<div class="line"></div>
-		<el-menu :default-active="activeIndex2" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-			<el-menu-item index="1">处理中心</el-menu-item>
-			<el-submenu index="2">
-				<template slot="title">我的工作台</template>
-				<el-menu-item index="2-1">选项1</el-menu-item>
-				<el-menu-item index="2-2">选项2</el-menu-item>
-				<el-menu-item index="2-3">选项3</el-menu-item>
-			</el-submenu>
-			<el-menu-item index="3"><a href="https://www.ele.me" target="_blank">订单管理</a></el-menu-item>
+			<el-menu-item index="3">收藏</el-menu-item>
+			<el-menu-item class = "navigator-buttons " index = "4">
+				<el-button @click = "handleClickRegister">注册</el-button>
+				<el-button @click = "handleClickLoigin">登录</el-button>
+			</el-menu-item>
 		</el-menu>
 	</div>
 </template>
 <script>
-	import Vue from 'vue';
-	import { Menu, Submenu, MenuItem } from 'element-ui';
-
-	Vue.use(Menu);
-	Vue.use(Submenu);
-	Vue.use(MenuItem);
-
 	export default {
 		data() {
 			return {
@@ -41,10 +27,26 @@
 		methods: {
 			handleSelect(key, keyPath) {
 				console.log(key, keyPath);
-			}
+			},
+			handleClickLoigin () {
+				console.log(1);
+			},
+			handleClickRegister () {
+				console.log(0);
+			},
 		}
 	};
 </script>
 <style lang = "scss">
+	.navigator-container {
+		position: relative;
+		z-index: 2;
 
+		.navigator-tabs .navigator-buttons {
+			top: 0;
+			right: 0;
+			position: absolute;
+			border-bottom: none !important;
+		}
+	}
 </style>

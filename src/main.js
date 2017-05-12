@@ -6,11 +6,10 @@ import './common/common.css';
 import router from './router';
 import store from './vuex/store';
 
-import { Menu, Submenu, MenuItem } from 'element-ui';
+import 'element-ui/lib/theme-default/index.css';
+import ElementUI from 'element-ui';
 
-Vue.use(Menu);
-Vue.use(Submenu);
-Vue.use(MenuItem);
+Vue.use(ElementUI);
 Vue.config.productionTip = false;
 
 new Vue({

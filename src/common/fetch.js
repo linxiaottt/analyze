@@ -1,5 +1,6 @@
 import qs from 'querystring';
 import fetch from 'node-fetch';
+import CONFIG from './config.json';
 
 export default async function FETCH (path, options = {}) {
     const config = {};
@@ -9,6 +10,7 @@ export default async function FETCH (path, options = {}) {
     header = header || {};
     method = method.toUpperCase();
 
+    if (!/http/.test(path)) path = CONFIG.host + path;
     if (body && body instanceof Object && method === 'POST') config.body = body;
     if (query && query instanceof Object) path = `${path}?` + qs.stringify(query);
 
