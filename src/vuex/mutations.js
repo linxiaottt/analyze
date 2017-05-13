@@ -1,4 +1,4 @@
-import { STOCK } from '../common/constants';
+import { STOCK, USER } from '../common/constants';
 
 export default {
     [STOCK.STOCK_INDEX_SEARCH.name] (state, payload) {
@@ -101,5 +101,13 @@ export default {
         for (const key in data) { list[key] = data[key]; }
         state.recentTrade = list;
     },
+    [USER.USER_REGISTER.name] (state, payload) {
+    	const { data } = payload;
+    	state.userInfo = data;
+    },
+    [USER.USER_LOGIN.name] (state, payload) {
+    	const { data } = payload;
+    	state.userInfo = data;
+    }
 };
 

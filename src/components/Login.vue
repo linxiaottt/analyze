@@ -10,7 +10,7 @@
 					<el-input v-model="form.username" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label = "密码">
-					<el-input v-model="form.password" auto-complete="off"></el-input>
+					<el-input v-model="form.password" auto-complete="off" type = "password" ></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -50,12 +50,28 @@
 			login () {
 				const { name } = USER.USER_REGISTER;
 				const final = () => { this.isLoading = false; };
-				this.publish(name, { data: this.form, final });
+				const success = () => { this.dialogVisible = false; };
+				const error = (msg) => {
+			        this.$notify({
+			          title: '警告',
+			          message: msg,
+			          type: 'warning'
+			        });
+				};
+				this.publish(name, { data: this.form, final, success, error });
 			},
 			register () {
 				const { name } = USER.USER_LOGIN;
+				const error = (msg) => {
+			        this.$notify({
+			          title: '警告',
+			          message: msg,
+			          type: 'warning'
+			        });
+				};
 				const final = () => { this.isLoading = false; };
-				this.publish(name, { data: this.form, final });
+				const success = () => { this.dialogVisible = false; };
+				this.publish(name, { data: this.form, final, success, error });
 			},
 			publish (type, payload) {
 				const { dispatch } = this.$store;
