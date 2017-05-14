@@ -28,7 +28,7 @@ export default async function FETCH (originPath, options = {}) {
 	const payload  = await fetchPath.then((response) => {
 		if (!(response instanceof Object)) return error('请求失败', final());
 		const result = response.body;
-		if (!(response.status == 200 && result && result.code == 200)) return error(result.msg, final());
+		if (!(response.status == 200 && result && (result.code == 200 || result.showapi_res_code == 0))) return error(result.msg, final());
 		return result;
 	}).catch(error => {});
 	if (!payload) return ;

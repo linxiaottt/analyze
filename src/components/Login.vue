@@ -1,6 +1,6 @@
 <template>
 	<div class = "login-container">
-		<el-dialog :visible.sync="dialogVisible">
+		<el-dialog :visible.sync="dialogVisible" size = "tiny">
 			<el-tabs v-model="curTab" @tab-click="clickTab" class = "login-tabs">
 			    <el-tab-pane label="注册" name="register"></el-tab-pane>
 			    <el-tab-pane label="登录" name="login"></el-tab-pane>

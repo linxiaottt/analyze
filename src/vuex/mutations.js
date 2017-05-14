@@ -2,6 +2,7 @@ import { STOCK, USER } from '../common/constants';
 
 export default {
     [STOCK.STOCK_INDEX_SEARCH.name] (state, payload) {
+    	console.log(payload);
         const data = payload.showapi_res_body;
         const { contentlist: contentList } = data;
 
@@ -84,6 +85,7 @@ export default {
         state.nameToStockInfo = list;
     },
     [STOCK.STOCK_LIST.name] (state, payload) {
+    	console.log('x', payload);
         const data = payload.showapi_res_body;
         const { contentlist: contentList } = data;
 

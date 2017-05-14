@@ -142,10 +142,11 @@
 		components: { Page, MyTable, Search, Navigator, Login },
 		methods: {
 			nameToStockInfoSubmit (content) {
+				console.log(this.state.loadingNameToStockInfo, content);
 				if (this.checkLoading('loadingNameToStockInfo')) return ;
 				const query = {};
 				const numReg = /^[0-9]{3,6}$/;
-				const pinyinReg = /^[a-zA-Z]{1, 8}$/;
+				const pinyinReg = /^[a-zA-Z]{1,8}$/;
 				const chineseReg = /[\u4E00-\u9FA5]/g;
 				if (numReg.test(content)) query.code = content;
 				else if (pinyinReg.test(content)) query.pinyin = content;
@@ -347,7 +348,7 @@
 			// 测试api
 			// this.getIndexTimeLine();
 			// this.getIndexList();
-			this.getRealTimeK();
+			// this.getRealTimeK();
 			// this.getTimeline();
 			// this.getHistory();
 			// this.getKLine();
@@ -426,10 +427,10 @@
 		}
 	}
 	.section-search {
-		margin-top: 20px;
+		margin-top: 100px;
 	}
 	.sec-2-filter {
-		margin: 40px 0 40px;
+		margin: 80px 0 40px;
 		position: relative;
 
 		.drop-down {
@@ -465,12 +466,12 @@
 		}
 	}
 	#sec-2 .sec-2-content {
+		padding-top: 80px;
+
 		.cell {
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			/*box-shadow: 0px 0px 0px 1px #ffffff;*/
-			/*& { border-bottom: 1px solid #ffffff; };*/
 		}
 		.sec-2-list {
 			display: flex;
