@@ -9,22 +9,34 @@
 				<el-menu-item index="2-3">选项3</el-menu-item>
 			</el-submenu>
 			<el-menu-item index="3">收藏</el-menu-item>
-			<el-menu-item class = "navigator-buttons " index = "4">
+			<el-menu-item class = "navigator-buttons" index = "4" v-if = "userInfo && userInfo.id">
+				<el-badge :value="0" :max="10" class = "navigator-badge">
+					<a><img :src = "userInfo.preview || preview"></a>
+				</el-badge>
+			</el-menu-item>
+			<el-menu-item class = "navigator-buttons" index = "5" v-else >
 				<el-button @click = "handleClickRegister">注册</el-button>
 				<el-button @click = "handleClickLogin">登录</el-button>
+				<el-button @click = "handleClickLogout">登录</el-button>
 			</el-menu-item>
 		</el-menu>
 	</div>
 </template>
 <script>
 	import PUBSUB from 'pubsub-js';
+	import { mapState } from 'vuex';
+	import preview from '../assets/preview.png';
 
 	export default {
 		data() {
 			return {
+				preview,
 				activeIndex: '1',
 				activeIndex2: '1'
 			};
+		},
+		computed: {
+			...mapState(['userInfo']),
 		},
 		methods: {
 			handleSelect(key, keyPath) {
@@ -35,6 +47,12 @@
 			handleClickRegister () {
 				PUBSUB.publish('login-show', "register");
 			},
+			handleClickLogout () {
+				this.$store.dispatch({ type: 'USER_LOGOUT' });
+			}
+		},
+		mounted () {
+			this.$store.dispatch({ type: 'USER_GET_MY_INFO'});
 		}
 	};
 </script>
@@ -42,12 +60,29 @@
 	.navigator-container {
 		position: relative;
 		z-index: 2;
+	}
 
-		.navigator-tabs .navigator-buttons {
-			top: 0;
-			right: 0;
-			position: absolute;
-			border-bottom: none !important;
+	.navigator-tabs .navigator-buttons {
+		top: 0;
+		right: 0;
+		position: absolute;
+		border-bottom: none !important;
+	}
+	.navigator-badge {
+		display: flex;
+		height: 100%;
+		align-items: center;
+
+		a {
+			display: inline-block;
+			width: 48px;
+			height: 48px;
+			text-decoration: none;
+		}
+		img {
+			width: 100%;
+			height: auto;
+			border-radius: 50%;
 		}
 	}
 </style>

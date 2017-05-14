@@ -83,5 +83,15 @@ export const USER = {
 		"method": "POST",
 		"name": "USER_LOGIN",
 		"path": "/user/login"
+	},
+	"USER_LOGOUT": {
+		"method": "GET",
+		"name": "USER_LOGOUT",
+		"path": "/user/logout"
+	},
+	"USER_GET_MY_INFO": {
+		"method": "GET",
+		"name": "USER_GET_MY_INFO",
+		"path": "/user/getMyInfo"
 	}
 };

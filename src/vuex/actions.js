@@ -71,5 +71,15 @@ export default {
 		const { type } = payload;
 		const { path, method } = USER[type];
 		fetch(path, { ...payload, commit, method });
+	},
+	[USER.USER_LOGOUT.name] ({ commit }, payload) {
+		const { type } = payload;
+		const { path, method } = USER[type];
+		fetch(path, { ...payload, commit, method });
+	},
+	[USER.USER_GET_MY_INFO.name] ({ commit }, payload) {
+		const { type } = payload;
+		const { path, method,  } = USER[type];
+		fetch(path, { commit, method, type });
 	}
 };

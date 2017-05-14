@@ -48,7 +48,7 @@
 				return this.hide();
 			},
 			login () {
-				const { name } = USER.USER_REGISTER;
+				const { name } = USER.USER_LOGIN;
 				const final = () => { this.isLoading = false; };
 				const success = () => { this.dialogVisible = false; };
 				const error = (msg) => {
@@ -61,7 +61,7 @@
 				this.publish(name, { data: this.form, final, success, error });
 			},
 			register () {
-				const { name } = USER.USER_LOGIN;
+				const { name } = USER.USER_REGISTER;
 				const error = (msg) => {
 			        this.$notify({
 			          title: '警告',

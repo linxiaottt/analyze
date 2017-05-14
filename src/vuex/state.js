@@ -24,5 +24,5 @@ export default  {
     // 沪深股票最新50条逐笔交易
     recentTrade: [],
     // 储存用户信息
-    userInofo: {},
+    userInfo: {},
 };
