@@ -106,7 +106,6 @@ export default {
     	state.userInfo = data;
     },
     [USER.USER_LOGIN.name] (state, payload) {
-    	console.log(payload.data);
     	const { data } = payload;
     	state.userInfo = data;
     },

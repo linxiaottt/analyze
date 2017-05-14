@@ -9,15 +9,20 @@
 				<el-menu-item index="2-3">选项3</el-menu-item>
 			</el-submenu>
 			<el-menu-item index="3">收藏</el-menu-item>
-			<el-menu-item class = "navigator-buttons" index = "4" v-if = "userInfo && userInfo.id">
+			<el-menu-item class = "navigator-preview navigator-buttons" index = "4" v-if = "userInfo && userInfo.id">
 				<el-badge :value="0" :max="10" class = "navigator-badge">
 					<a><img :src = "userInfo.preview || preview"></a>
 				</el-badge>
+				<div v-if = "true" class = "navigator-panel">
+					<a>主页</a>
+					<a>收藏</a>
+					<a>信息</a>
+					<a @click = "handleClickLogout">退出</a>
+				</div>
 			</el-menu-item>
 			<el-menu-item class = "navigator-buttons" index = "5" v-else >
 				<el-button @click = "handleClickRegister">注册</el-button>
 				<el-button @click = "handleClickLogin">登录</el-button>
-				<el-button @click = "handleClickLogout">登录</el-button>
 			</el-menu-item>
 		</el-menu>
 	</div>
@@ -83,6 +88,37 @@
 			width: 100%;
 			height: auto;
 			border-radius: 50%;
+		}
+	}
+	.navigator-preview:hover {
+		.navigator-panel { opacity: 1 }
+	}
+	.navigator-panel {
+		opacity: 0;
+		position: absolute;
+		top: 60px;
+		right: 20px;
+		background: #ffffff;
+		border-radius: 0 0 4px 4px;
+		transition: .3s all ease-in-out;
+		box-sizing: border-box;
+		padding: 10px 10px;
+		width: 250px;
+		line-height: 1.5;
+		white-space: pre-wrap;
+		font-size: 0;
+
+		a {
+			width: 50%;
+			font-size: 12px;
+			padding: 5px 0;
+			display: inline-block;
+			box-sizing: border-box;
+			transition: all .3s ease-in-out;
+			-webkit-text-size-adjust: none;
+			&:last-child { color: red; }
+
+			&:hover { color: #0570dc !important; }
 		}
 	}
 </style>

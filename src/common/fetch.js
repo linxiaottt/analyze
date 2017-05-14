@@ -1,26 +1,22 @@
-import qs from 'querystring';
-import fetch from 'node-fetch';
+import fetch from 'superagent';
 import CONFIG from './config.json';
 
-export default async function FETCH (path, options = {}) {
+export default async function FETCH (originPath, options = {}) {
 	const config = {};
-	// let fetchPath = null;
+	let fetchPath = null;
 	const { type, commit, query, data } = options;
 	let { success, error, final, method, header } = options;
+	const path = /http/.test(originPath) ? originPath : CONFIG.host + originPath;
 
-	header = header || {};
-	method = method.toUpperCase();
-	// fetchPath = fetch[method.toLowercase()](path)
-	if (/http/.test(path)) config.headers = { ...header, 'Authorization': 'APPCODE f994ec0219f049799e312fc9c63bcb25' };
-	if (!/http/.test(path)) config.headers = { ...header, 'Content-Type':'application/x-www-form-urlencoded'};
+	method = method.toLowerCase();
+	fetchPath = fetch[method](path);
 
-	if (query && query instanceof Object) path = `${path}?` + qs.stringify(query);
-	if (data && data instanceof Object && /post/i.test(method)) config.body = qs.stringify(data);
 
-	config.method = method;
-	config.credentials = 'include';
+	if (query) fetchPath.query(query);
+	if (data && /post/i.test(method)) fetchPath.send(data);
 
-	if (!/http/.test(path)) path = CONFIG.host + path;
+	if (!/http/.test(originPath)) fetchPath = fetchPath.withCredentials();
+	if (/http/.test(originPath)) fetchPath.set('Authorization', 'APPCODE f994ec0219f049799e312fc9c63bcb25');
 
 	// 产生错误执行的函数
 	error = typeof error === 'function'? error: () => {};
@@ -29,13 +25,12 @@ export default async function FETCH (path, options = {}) {
 	// 成功的时候执行的函数
 	success = typeof success === 'function'? success: () => {};
 
-	const payload  = await fetch(path, config).then(async (response) => {
+	const payload  = await fetchPath.then((response) => {
 		if (!(response instanceof Object)) return error('请求失败', final());
-		const result = await response.json();
-		if (!(response.status == 200 && result instanceof Object)) return error(result.msg, final());
+		const result = response.body;
+		if (!(response.status == 200 && result && result.code == 200)) return error(result.msg, final());
 		return result;
-	});
-
+	}).catch(error => {});
 	if (!payload) return ;
 	commit(type, payload);
 	return success(final());
