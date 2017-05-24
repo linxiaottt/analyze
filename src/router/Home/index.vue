@@ -437,6 +437,7 @@
 			width: 128px;
 			height: 40px;
 			line-height: 40px;
+			text-align: center;
 			margin: 0 auto;
 			color: #000000;
 			background: #FFFFFF;

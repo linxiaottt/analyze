@@ -15,7 +15,7 @@ export default async function FETCH (originPath, options = {}) {
 	if (query) fetchPath.query(query);
 	if (data && /post/i.test(method)) fetchPath.send(data);
 
-	if (!/http/.test(originPath)) fetchPath = fetchPath.withCredentials();
+	if (!/http/.test(originPath)) fetchPath.withCredentials();
 	if (/http/.test(originPath)) fetchPath.set('Authorization', 'APPCODE f994ec0219f049799e312fc9c63bcb25');
 
 	// 产生错误执行的函数

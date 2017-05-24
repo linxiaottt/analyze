@@ -1,40 +1,45 @@
 <template>
-	<div class = "info-container">
-		<div class = "info-main">
-			<ul class = "info-short">
-				<div class = "info-title">股票基本信息</div>
-				<li v-for = "(value, key, index) in stockInfo" :key = "index" v-if = "value.length">
-					<span class = "info-stock-key"> {{ key | stockKeyFilter }} : </span>
-					<span class = "info-stock-value"> {{ value }}</span>
-				</li>
-			</ul>
-			<div class = "info-k" >
-				<div class = "info-title" v-if = "false">K线图</div>
-				<div class = "info-k-control">
-					<div>
-						<Datepicker language = "zh" format ="yyyyMMdd"
-						placeholder = "请输入开始日期" v-on:selected = "clickDate"/>
+	<div class = "info-wrap">
+		<div class = "info-container">
+			<div class = "info-main">
+				<ul class = "info-short">
+					<div class = "info-title">股票基本信息</div>
+					<li v-for = "(value, key, index) in stockInfo" :key = "index" v-if = "value.length">
+						<span class = "info-stock-key"> {{ key | stockKeyFilter }} : </span>
+						<span class = "info-stock-value"> {{ value }}</span>
+					</li>
+				</ul>
+				<div class = "info-k" >
+					<div class = "info-title" v-if = "false">K线图</div>
+					<div class = "info-k-control">
+						<div>
+							<Datepicker language = "zh" format ="yyyyMMdd"
+							placeholder = "请输入开始日期" v-on:selected = "clickDate"/>
+						</div>
+						<div>
+							<Selector :options = "timeList | timeListFilter(stockInfo)" placeholder = "分时线" :handleClickOption = "clickFS"/>
+						</div>
+						<div>
+							<Selector :options = "fqList" placeholder = "复权方式" :handleClickOption = "clickFQ"/>
+						</div>
 					</div>
-					<div>
-						<Selector :options = "timeList | timeListFilter(stockInfo)" placeholder = "分时线" :handleClickOption = "clickFS"/>
+					<div class = "info-k-container">
+						<K :k = "k.k" :v = "k.v" :x = "k.x" />
 					</div>
-					<div>
-						<Selector :options = "fqList" placeholder = "复权方式" :handleClickOption = "clickFQ"/>
-					</div>
-				</div>
-				<div class = "info-k-container">
-					<K :k = "k.k" :v = "k.v" :x = "k.x" />
 				</div>
 			</div>
+			<div class = "info-side">
+				<div class = "info-title">股票实时行情</div>
+				<ul>
+					<li v-for = "(value, key, index) in realtime" :key = "index" >
+						<span class = "info-realtime-key"> {{ key | realtimeKeyFilter }} : </span>
+						<span class = "info-realtime-value">{{ value }}</span>
+					</li>
+				</ul>
+			</div>
 		</div>
-		<div class = "info-side">
-			<div class = "info-title">股票实时行情</div>
-			<ul>
-				<li v-for = "(value, key, index) in realtime" :key = "index" >
-					<span class = "info-realtime-key"> {{ key | realtimeKeyFilter }} : </span>
-					<span class = "info-realtime-value">{{ value }}</span>
-				</li>
-			</ul>
+		<div class = "info-something">
+			<h2 class = "info-stock-name"></h2>
 		</div>
 	</div>
 </template>
@@ -230,6 +235,15 @@
 	};
 </script>
 <style lang = "scss">
+	.info-wrap { height: 100%; }
+	.info-something {
+		height: 100%;
+		background: inherit;
+		background-color: #4f7f9b;
+		background-repeat: repeat-x;
+	   	background-image: linear-gradient(#4f7f9b, #293c55);
+	   	background-position: fixed;
+	}
 	.info-container {
 		display: flex;
 		flex-direction: row;
@@ -238,7 +252,7 @@
 		height: 100%;
 		padding: 20px;
 		box-sizing: border-box;
-
+		box-shadow: 0px 5px 5px 0 #5f3c55;
 		color: #ffffff;
 		font-size: 10px;
 
