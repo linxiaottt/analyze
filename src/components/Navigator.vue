@@ -15,7 +15,7 @@
 				</el-badge>
 				<div v-if = "true" class = "navigator-panel">
 					<a>主页</a>
-					<a>收藏</a>
+					<router-link to = "/collection">收藏</router-link>
 					<a>信息</a>
 					<a @click = "handleClickLogout">退出</a>
 				</div>
@@ -111,13 +111,14 @@
 
 		a {
 			width: 50%;
+			color: #20a0ff !important;
 			font-size: 12px;
 			padding: 5px 0;
 			display: inline-block;
 			box-sizing: border-box;
 			transition: all .3s ease-in-out;
 			-webkit-text-size-adjust: none;
-			&:last-child { color: red; }
+			&:last-child { color: red !important; }
 
 			&:hover { color: #0570dc !important; }
 		}

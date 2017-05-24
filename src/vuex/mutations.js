@@ -1,4 +1,4 @@
-import { STOCK, USER } from '../common/constants';
+import { STOCK, USER, COLLECTION } from '../common/constants';
 
 export default {
     [STOCK.STOCK_INDEX_SEARCH.name] (state, payload) {
@@ -117,6 +117,16 @@ export default {
     [USER.USER_GET_MY_INFO.name] (state, payload) {
     	const { data } = payload;
     	state.userInfo = data;
+    },
+    [COLLECTION.COLLECTION_COLLECT.name] (state, payload) {
+    	const { data } = payload;
+    },
+    [COLLECTION.COLLECTION_UNCOLLECT.name] (state, payload) {
+    	const { data } = payload;
+    },
+    [COLLECTION.COLLECTION_GET_COLLECTED.name] (state, payload) {
+    	const { data } = payload;
+    	state.collectionTable = data;
     }
 };
 

@@ -95,3 +95,21 @@ export const USER = {
 		"path": "/user/getMyInfo"
 	}
 };
+
+export const COLLECTION = {
+	"COLLECTION_COLLECT": {
+		"method": "POST",
+		"name": "COLLECTION_COLLECT",
+		"path": "/collection/collect"
+	},
+	"COLLECTION_UNCOLLECT": {
+		"method": "GET",
+		"name": "COLLECTION_UNCOLLECT",
+		"path": "/collection/unCollect"
+	},
+	"COLLECTION_GET_COLLECTED": {
+		"method": "GET",
+		"name": "COLLECTION_GET_COLLECTED",
+		"path": "/collection/getCollected"
+	}
+};

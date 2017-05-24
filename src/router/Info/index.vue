@@ -3,7 +3,14 @@
 		<div class = "info-container">
 			<div class = "info-main">
 				<ul class = "info-short">
-					<div class = "info-title">股票基本信息</div>
+					<div class = "info-title">股票基本信息
+						<span class = "info-collect"
+							:class = "{'info-collected': isCollected}"
+							v-loading.lock = "isLoading"
+							@click = "collect">
+							{{ isCollected ? "已收藏" : "收藏" }}
+						</span>
+					</div>
 					<li v-for = "(value, key, index) in stockInfo" :key = "index" v-if = "value.length">
 						<span class = "info-stock-key"> {{ key | stockKeyFilter }} : </span>
 						<span class = "info-stock-value"> {{ value }}</span>
@@ -50,13 +57,15 @@
 	import K from '../../components/K';
 	import Selector from '../../components/Selector';
 
-	import { STOCK } from '../../common/constants';
+	import { STOCK, COLLECTION } from '../../common/constants';
 
 	export default {
 		data () {
 			return {
 				stockInfo: {},
 				realtime: {},
+				isCollected: false,
+				isLoading: false,
 				k: {
 					x: [],
 					y: [],
@@ -105,6 +114,7 @@
 		},
 		computed: {
 			...mapState([
+				'userInfo',
 				'realTimeK',
 				'realStockInfo',
 				'nameToStockInfo',
@@ -184,6 +194,23 @@
 			},
 		},
 		methods: {
+			collect () {
+				if (this.isLoading) return ;
+				if (!this.userInfo.id) return ;
+				if (this.isCollected) return this.unCollect();
+				const { code, market } = this.stockInfo;
+				const { name } = COLLECTION.COLLECTION_COLLECT;
+				const final = () => { this.isLoading = false; };
+				const success = () => { this.isCollected = !this.isCollected; };
+				this.publish(name, { success, final, data: { code, market, username: this.userInfo.username }});
+			},
+			unCollect() {
+				const { code, market } = this.stockInfo;
+				const { name } = COLLECTION.COLLECTION_UNCOLLECT;
+				const final = () => { this.isLoading = false; };
+				const success = () => { this.isCollected = !this.isCollected; };
+				this.publish(name, { success, final, query: { code, market, username: this.userInfo.username }});
+			},
 			publish (type, payload) {
 				const { dispatch } = this.$store;
 				dispatch({ ... payload, type });
@@ -277,7 +304,17 @@
 	.border { border: 1px solid #ffffff; border-radius: 4px; }
 
 	 /*区块处理*/
-	 .info-title { width: 100%; box-sizing: border-box; text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+	 .info-title { position: relative; width: 100%; box-sizing: border-box; text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+	 .info-collect {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		height: 100%;
+		font-size: .6em;
+		cursor: pointer;
+		&:hover { color: #20a0ff; }
+	 }
+	 .info-collected { color: #666666; &:hover { color: #666666; } }
 	.info-short {
 		font-size: 0;
 		li {

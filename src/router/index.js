@@ -20,9 +20,9 @@ const router = new Router({
         component: resolve => require(['../components/page/Login.vue'], resolve)
 	}, {
 		path: '/collection',
-		name: 'collection',
-		components: resolve => require(['./Collection/index.vue'], resolve)
-	},{
+		name: 'Collection',
+		component: r => require.ensure([], () => r(require('./Collection/index.vue')), 'Collection')
+	}, {
 		path: '/admin',
 		name: 'Admin',
 		redirect: '/admin/readme',
@@ -68,10 +68,4 @@ const router = new Router({
 	}]
 });
 export default router;
-router.beforeEach((to, from, next) => {
-	let needLogin = false;
-	if (/admin/i.test(to.path)) needLogin = true;
-	// needLogin = false;
-	if (!needLogin) next();
-	else if (needLogin) next('login');
-});
+
