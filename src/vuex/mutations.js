@@ -127,6 +127,9 @@ export default {
     [COLLECTION.COLLECTION_GET_COLLECTED.name] (state, payload) {
     	const { data } = payload;
     	state.collectionTable = data;
+    },
+    [COLLECTION.COLLECTION_HAS_COLLECTED.name] (state, payload) {
+    	const { data } = payload;
     }
 };
 

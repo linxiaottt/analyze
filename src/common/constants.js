@@ -111,5 +111,10 @@ export const COLLECTION = {
 		"method": "GET",
 		"name": "COLLECTION_GET_COLLECTED",
 		"path": "/collection/getCollected"
+	},
+	"COLLECTION_HAS_COLLECTED": {
+		"method": "GET",
+		"name": "COLLECTION_HAS_COLLECTED",
+		"path": "/collection/hasCollected"
 	}
 };

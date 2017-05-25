@@ -96,5 +96,10 @@ export default {
 		const { type } = payload;
 		const { path, method } = COLLECTION[type];
 		fetch(path, { commit, method, type, ...payload });
+	},
+	[COLLECTION.COLLECTION_HAS_COLLECTED.name] ({ commit }, payload) {
+		const { type } = payload;
+		const { path, method } = COLLECTION[type];
+		fetch(path, { commit, method, type, ...payload });
 	}
 };
