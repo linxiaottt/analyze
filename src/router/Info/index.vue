@@ -5,50 +5,60 @@
 				<ul class = "info-short">
 					<div class = "info-title">股票基本信息
 						<span class = "info-collect"
-							:class = "{'info-collected': isCollected}"
-							v-loading.lock = "isLoading"
-							@click = "collect">
-							{{ isCollected ? "已收藏" : "收藏" }}
-						</span>
+						:class = "{'info-collected': isCollected}"
+						v-loading.lock = "isLoading"
+						@click = "collect">
+						{{ isCollected ? "已收藏" : "收藏" }}
+					</span>
+				</div>
+				<li v-for = "(value, key, index) in stockInfo" :key = "index" v-if = "value.length">
+					<span class = "info-stock-key"> {{ key | stockKeyFilter }} : </span>
+					<span class = "info-stock-value"> {{ value }}</span>
+				</li>
+			</ul>
+			<div class = "info-k" >
+				<div class = "info-title" v-if = "false">K线图</div>
+				<div class = "info-k-control">
+					<div>
+						<Datepicker language = "zh" format ="yyyyMMdd"
+						placeholder = "请输入开始日期" v-on:selected = "clickDate"/>
 					</div>
-					<li v-for = "(value, key, index) in stockInfo" :key = "index" v-if = "value.length">
-						<span class = "info-stock-key"> {{ key | stockKeyFilter }} : </span>
-						<span class = "info-stock-value"> {{ value }}</span>
-					</li>
-				</ul>
-				<div class = "info-k" >
-					<div class = "info-title" v-if = "false">K线图</div>
-					<div class = "info-k-control">
-						<div>
-							<Datepicker language = "zh" format ="yyyyMMdd"
-							placeholder = "请输入开始日期" v-on:selected = "clickDate"/>
-						</div>
-						<div>
-							<Selector :options = "timeList | timeListFilter(stockInfo)" placeholder = "分时线" :handleClickOption = "clickFS"/>
-						</div>
-						<div>
-							<Selector :options = "fqList" placeholder = "复权方式" :handleClickOption = "clickFQ"/>
-						</div>
+					<div>
+						<Selector :options = "timeList | timeListFilter(stockInfo)" placeholder = "分时线" :handleClickOption = "clickFS"/>
 					</div>
-					<div class = "info-k-container">
-						<K :k = "k.k" :v = "k.v" :x = "k.x" />
+					<div>
+						<Selector :options = "fqList" placeholder = "复权方式" :handleClickOption = "clickFQ"/>
 					</div>
 				</div>
-			</div>
-			<div class = "info-side">
-				<div class = "info-title">股票实时行情</div>
-				<ul>
-					<li v-for = "(value, key, index) in realtime" :key = "index" >
-						<span class = "info-realtime-key"> {{ key | realtimeKeyFilter }} : </span>
-						<span class = "info-realtime-value">{{ value }}</span>
-					</li>
-				</ul>
+				<div class = "info-k-container">
+					<K :k = "k.k" :v = "k.v" :x = "k.x" />
+				</div>
 			</div>
 		</div>
-		<div class = "info-something">
-			<h2 class = "info-stock-name"></h2>
+		<div class = "info-side">
+			<div class = "info-title">股票实时行情</div>
+			<ul>
+				<li v-for = "(value, key, index) in realtime" :key = "index" >
+					<span class = "info-realtime-key"> {{ key | realtimeKeyFilter }} : </span>
+					<span class = "info-realtime-value">{{ value }}</span>
+				</li>
+			</ul>
 		</div>
 	</div>
+	<div class = "info-something">
+		<h2 class = "info-stock-name">相关信息</h2>
+		<div class = "info-sth-container">
+			<el-table :data="stockNews" border style="width: 100%">
+				<el-table-column prop="title" label="标题" sortable width="400">
+				</el-table-column>
+				<el-table-column prop="time" label="时间" width="400">
+				</el-table-column>
+				<el-table-column prop="url" label="链接">
+				</el-table-column>
+			</el-table>
+		</div>
+	</div>
+</div>
 </template>
 <script>
 	import Datepicker from 'vuejs-datepicker';
@@ -115,10 +125,11 @@
 		computed: {
 			...mapState([
 				'userInfo',
+				'stockNews',
 				'realTimeK',
 				'realStockInfo',
 				'nameToStockInfo',
-			]),
+				]),
 		},
 		components: { K, Datepicker, Selector },
 		filters: {
@@ -215,6 +226,14 @@
 				const { dispatch } = this.$store;
 				dispatch({ ... payload, type });
 			},
+			getStockNews () {
+				const n = 51;
+				const page = 1;
+				const type = 2;
+				const symbol = "hk00700";
+				const _var = "finance_news";
+				this.publish(STOCK.STOCK_NEWS.name, { query: { n, page, type, symbol }});
+			},
 			getNameToStockInfo (code) {
 				const query = { code };
 				this.publish(STOCK.STOCK_NAME_TO_STOCK_INFO.name, { query });
@@ -258,18 +277,20 @@
 			this.getNameToStockInfo(code);
 			this.getRealStockInfo(code);
 			this.getRealTimeK({ code });
+			this.getStockNews();
 		},
 	};
 </script>
 <style lang = "scss">
-	.info-wrap { height: 100%; }
+	.info-wrap { height: 100%; overflow: scroll; }
 	.info-something {
 		height: 100%;
 		background: inherit;
 		background-color: #4f7f9b;
+		background-position: fixed;
 		background-repeat: repeat-x;
-	   	background-image: linear-gradient(#4f7f9b, #293c55);
-	   	background-position: fixed;
+		background-image: linear-gradient(#4f7f9b, #293c55);
+		.info-stock-name { font-size: 24px;  padding: 20px 0 0; text-align: center; color: #ffffff;}
 	}
 	.info-container {
 		display: flex;
@@ -277,7 +298,7 @@
 
 		width: 100%;
 		height: 100%;
-		padding: 20px;
+
 		box-sizing: border-box;
 		box-shadow: 0px 5px 5px 0 #5f3c55;
 		color: #ffffff;
@@ -303,9 +324,9 @@
 	}
 	.border { border: 1px solid #ffffff; border-radius: 4px; }
 
-	 /*区块处理*/
-	 .info-title { position: relative; width: 100%; box-sizing: border-box; text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
-	 .info-collect {
+	/*区块处理*/
+	.info-title { position: relative; width: 100%; box-sizing: border-box; text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+	.info-collect {
 		position: absolute;
 		right: 0;
 		bottom: 0;
@@ -313,8 +334,8 @@
 		font-size: .6em;
 		cursor: pointer;
 		&:hover { color: #20a0ff; }
-	 }
-	 .info-collected { color: #666666; &:hover { color: #666666; } }
+	}
+	.info-collected { color: #666666; &:hover { color: #666666; } }
 	.info-short {
 		font-size: 0;
 		li {

@@ -25,6 +25,8 @@ export default  {
     recentTrade: [],
     // 储存用户信息
     userInfo: {},
+    // 股票信息
+    stockNews: [],
     // 收藏数目
     collectionTable: [],
 };

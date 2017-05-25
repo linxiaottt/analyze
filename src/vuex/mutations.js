@@ -103,6 +103,10 @@ export default {
         for (const key in data) { list[key] = data[key]; }
         state.recentTrade = list;
     },
+    [STOCK.STOCK_NEWS.name] (state, payload) {
+    	const { data } = payload;
+    	state.stockNews = data.data;
+    },
     [USER.USER_REGISTER.name] (state, payload) {
     	const { data } = payload;
     	state.userInfo = data;
@@ -130,6 +134,7 @@ export default {
     },
     [COLLECTION.COLLECTION_HAS_COLLECTED.name] (state, payload) {
     	const { data } = payload;
+
     }
 };
 

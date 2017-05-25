@@ -70,6 +70,11 @@ export const STOCK = {
         "method": "GET",
         "name": "STOCK_EVERY_TRADE",
         "path": "http://ali-stock.showapi.com/everytrade"
+    },
+    "STOCK_NEWS": {
+    	"method": "GET",
+    	"name": "STOCK_NEWS",
+    	"path": "http://web.ifzq.gtimg.cn/appstock/news/info/search"
     }
 };
 

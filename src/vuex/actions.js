@@ -62,6 +62,11 @@ export default {
         const { path, method } = STOCK[type];
         fetch(path, { ...payload, commit, method });
     },
+    [STOCK.STOCK_NEWS.name] ({ commit }, payload) {
+    	const { type } = payload;
+    	const { path, method } = STOCK[type];
+    	fetch(path, { ...payload, commit, method });
+    },
     [USER.USER_REGISTER.name] ({ commit }, payload) {
 		const { type } = payload;
 		const { path, method } = USER[type];

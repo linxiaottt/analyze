@@ -16,7 +16,7 @@ export default async function FETCH (originPath, options = {}) {
 	if (data && /post/i.test(method)) fetchPath = fetchPath.send(data);
 
 	if (!/http/.test(originPath)) fetchPath = fetchPath.withCredentials();
-	if (/http/.test(originPath)) fetchPath = fetchPath.set('Authorization', 'APPCODE f994ec0219f049799e312fc9c63bcb25');
+	if (/showapi/.test(path)) fetchPath = fetchPath.set('Authorization', 'APPCODE f994ec0219f049799e312fc9c63bcb25');
 
 	// 产生错误执行的函数
 	error = typeof error === 'function'? error: () => {};
@@ -26,9 +26,10 @@ export default async function FETCH (originPath, options = {}) {
 	success = typeof success === 'function'? success: () => {};
 
 	const payload  = await fetchPath.then(response => {
-		const result = response.body;
+		let result = response.body;
+		result = result || JSON.parse(response.text);
 		if (!(response instanceof Object)) return error('请求失败', final());
-		if (!(response.status == 200 && result && (result.code == 200 || result.showapi_res_code == 0))) return error(result.msg, final());
+		if (!(response.status == 200 && result && (result.code == 200 || result.code == 0 || result.showapi_res_code == 0))) return error(result.msg, final());
 		return result;
 	}).catch(error => {});
 	if (!payload) return ;
