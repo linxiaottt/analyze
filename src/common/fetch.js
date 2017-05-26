@@ -13,11 +13,11 @@ export default async function FETCH (originPath, options = {}) {
 
 
 	if (query) fetchPath.query(query);
-	if (data && /post/i.test(method)) fetchPath = fetchPath.send(data);
+	if (data && /post/i.test(method)) fetchPath.send(data);
 
-	if (!/http/.test(originPath)) fetchPath = fetchPath.withCredentials();
-	if (/showapi/.test(path)) fetchPath = fetchPath.set('Authorization', 'APPCODE f994ec0219f049799e312fc9c63bcb25');
-
+	if (!/http/.test(originPath)) fetchPath.withCredentials();
+	if (/showapi/.test(path)) fetchPath.set('Authorization', 'APPCODE f994ec0219f049799e312fc9c63bcb25');
+    console.log(fetchPath, 'x');
 	// 产生错误执行的函数
 	error = typeof error === 'function'? error: () => {};
 	// 无论如何 最终都会执行的函数
