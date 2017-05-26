@@ -79,13 +79,14 @@ export default {
         const data = payload.showapi_res_body;
         const { list } = data;
 
+
         delete data.list;
 
         for (const key in data) { list[key] = data[key]; }
+
         state.nameToStockInfo = list;
     },
     [STOCK.STOCK_LIST.name] (state, payload) {
-    	console.log('x', payload);
         const data = payload.showapi_res_body;
         const { contentlist: contentList } = data;
 
