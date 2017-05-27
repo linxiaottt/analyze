@@ -121,5 +121,8 @@ export const COLLECTION = {
 		"method": "GET",
 		"name": "COLLECTION_HAS_COLLECTED",
 		"path": "/collection/hasCollected"
-	}
+	},
+    "COLLECTION_DELETE_BY_ID": {
+        "name": "COLLECTION_DELETE_BY_ID"
+    }
 };

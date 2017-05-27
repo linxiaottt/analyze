@@ -2,22 +2,21 @@
 	<div class = "collection-container">
 		<Navigator />
 		<div class = "collection-main">
-			<el-table :data="collectionTable" border style="width: 100%">
+			<el-table :data="collectionTable" border style="width: 100%" :stripe = "true" @row-click="handleClickRow">
+				<el-table-column prop="stockName" label="股票名称" width="250"></el-table-column>
 				<el-table-column prop="stockMarket" label="股票市场" width="250"></el-table-column>
 				<el-table-column prop="stockId" label="股票编码" width="250"></el-table-column>
 				<el-table-column prop="createAt" label="收藏时间" sortable width="250"></el-table-column>
 				<el-table-column label="操作">
 					<template scope="scope">
-						<el-button size="small"
-						@click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 						<el-button size="small" type="danger"
-						@click="handleDelete(scope.$index, scope.row)">删除</el-button>
+						@click="handleUnCollect(scope.$index, scope.row)">删除</el-button>
 					</template>
 				</el-table-column>
 			</el-table>
 			<div class="pagination">
-				<el-pagination
-				@current-change ="handleCurrentChange"
+				<el-pagination v-if = "false"
+				@current-change ="true"
 				layout="prev, pager, next"
 				:total="1000">
 			</el-pagination>
@@ -27,12 +26,13 @@
 </div>
 </template>
 <script>
-	import { COLLECTION } from '../../common/constants';
+    import PUBSUB from 'pubsub-js';
+	import { mapState } from 'vuex';
 
 	import Login from '../../components/Login';
 	import Navigator from '../../components/Navigator';
+	import { COLLECTION } from '../../common/constants';
 
-	import { mapState } from 'vuex';
 	export default {
 		data () {
 			return {
@@ -42,9 +42,16 @@
 			...mapState(['userInfo', 'collectionTable']),
 		},
 		methods: {
-			handleEdit () {},
-			handleDelete () {},
-			handleCurrentChange () {},
+            handleClickRow (data, event, col) {
+                if (/操作/.test(col.label)) return;
+                const { stockId } = data;
+                this.$router.push('/stock/' + stockId);
+            },
+            handleUnCollect (index, data) {
+                const { stockId, stockMarket } = data;
+                const success = () => { this.publish(COLLECTION.COLLECTION_DELETE_BY_ID.name, { id: stockId }); };
+                this.publish(COLLECTION.COLLECTION_UNCOLLECT.name, { success, query: { code: stockId, market: stockMarket } });
+            },
 			publish (type, payload) {
 				const { dispatch } = this.$store;
 				dispatch({ type, ...payload });
@@ -56,15 +63,13 @@
 		},
 		filters: {
 			date (string) {
-				console.log(string);
 				return string;
 			}
 		},
 		mounted () {
-			// if (!this.userInfo.id) return this.$notify({ type: 'warning', title: '', message: '请先登录'});
 			const { username } = this.userInfo;
 			const { name } = COLLECTION.COLLECTION_GET_COLLECTED;
-			this.publish(name, { query: { username: 1 }});
+			this.publish(name, { query: { username }});
 		},
 
 	};

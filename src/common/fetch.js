@@ -17,7 +17,6 @@ export default async function FETCH (originPath, options = {}) {
 
 	if (!/http/.test(originPath)) fetchPath.withCredentials();
 	if (/showapi/.test(path)) fetchPath.set('Authorization', 'APPCODE f994ec0219f049799e312fc9c63bcb25');
-    console.log(fetchPath, 'x');
 	// 产生错误执行的函数
 	error = typeof error === 'function'? error: () => {};
 	// 无论如何 最终都会执行的函数
@@ -34,7 +33,7 @@ export default async function FETCH (originPath, options = {}) {
 	}).catch(error => {});
 	if (!payload) return ;
 	commit(type, payload);
-	return success(final());
+	return success(payload, final());
 };
 
 

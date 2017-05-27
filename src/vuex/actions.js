@@ -106,5 +106,8 @@ export default {
 		const { type } = payload;
 		const { path, method } = COLLECTION[type];
 		fetch(path, { commit, method, type, ...payload });
-	}
+	},
+    [COLLECTION.COLLECTION_DELETE_BY_ID.name] ({ commit }, payload) {
+        commit(payload);
+    }
 };

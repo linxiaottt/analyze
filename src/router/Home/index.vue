@@ -43,7 +43,9 @@
 								{{ (rowIndex + 1) + (indexListSearch.currentPage - 1) * indexListSearch.maxResult + (state.indexSearchPage - 1) *numPerPage }}
 							</span>
 							<li v-for = "(col, colIndex) in row"
-								:key = "colIndex">
+								:key = "colIndex" 
+                                @click = "handleClickTableRow(row)"
+                                >
 								{{ col }}
 							</li>
 						</ul>
@@ -341,6 +343,9 @@
 				this.state[key] = true;
 				setTimeout(() => { this.state[key] = false; });
 			},
+            handleClickTableRow ({ code }) {
+                this.$router.push(`/stock/${ code }`);
+            }
 		},
 		mounted () {
 			const chart = this.$refs.chart;

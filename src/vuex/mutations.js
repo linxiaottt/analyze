@@ -136,6 +136,10 @@ export default {
     [COLLECTION.COLLECTION_HAS_COLLECTED.name] (state, payload) {
     	const { data } = payload;
 
+    },
+    [COLLECTION.COLLECTION_DELETE_BY_ID.name] (state, payload) {
+        const { id } = payload;
+        state.collectionTable = state.collectionTable.filter(data => data.stockId !== id);
     }
 };
 

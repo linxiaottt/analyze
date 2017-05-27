@@ -49,12 +49,10 @@
 	<div class = "info-something">
 		<h2 class = "info-stock-name">相关信息</h2>
 		<div class = "info-sth-container">
-			<el-table :data="stockNews" border style="width: 100%">
-				<el-table-column prop="title" label="标题" sortable width="400">
+			<el-table :data="stockNews" border style="width: 100%" @row-click = "handleClickNewsTableRow">
+				<el-table-column prop="title" label="标题" sortable width="500">
 				</el-table-column>
-				<el-table-column prop="time" label="时间" width="400">
-				</el-table-column>
-				<el-table-column prop="url" label="链接">
+				<el-table-column prop="time" label="时间" width="500">
 				</el-table-column>
 			</el-table>
 		</div>
@@ -216,16 +214,16 @@
 				if (this.isLoading) return ;
 				if (!this.userInfo.id) return this.callLater(this.hasCollected.bind(this)) && PUBSUB.publish('login-show', "login");
 				if (this.isCollected) return this.unCollect();
-				const { code, market } = this.stockInfo;
+				const { code, market, name: stockName } = this.stockInfo;
 				const { name } = COLLECTION.COLLECTION_COLLECT;
 				const final = () => { this.isLoading = false; };
 				const success = () => { this.isCollected = !this.isCollected; };
-				this.publish(name, { success, final, data: { code, market, username: this.userInfo.username }});
+				this.publish(name, { success, final, data: { code, market, username: this.userInfo.username, name: stockName }});
 			},
             hasCollected () {
-                const { code, market } = this.nameToStockInfo;
+                const { code, market } = this.stockInfo;
                 const { name } = COLLECTION.COLLECTION_HAS_COLLECTED;
-                const { success } = (has) => { this.isCollected = has; };
+                const  success  = (payload) => { this.isCollected = payload.data.has; };
                 this.publish(name, { success, query: { market, code, username: this.userInfo.username } });
             },
 			unCollect() {
@@ -245,11 +243,14 @@
                 setTimeout(callback.bind(this), time);
                 return true;
             },
+            handleClickNewsTableRow (data) {
+                if (data.url) window.open(data.url);
+            },
 			getStockNews () {
 				const n = 51;
 				const page = 1;
 				const type = 2;
-                const { market, code } = this.nameToStockInfo;
+                const { market, code } = this.stockInfo;
 				const symbol = market + code;
 				const _var = "finance_news";
 				this.publish(STOCK.STOCK_NEWS.name, { query: { n, page, type, symbol }});
@@ -294,11 +295,15 @@
 		},
 		mounted () {
 			const { code } = this.$route.params;
+            const self = this;
 			this.getNameToStockInfo(code);
 			this.getRealStockInfo(code);
 			this.getRealTimeK({ code });
-			this.getStockNews();
-            this.hasCollected();
+            setTimeout(function () {
+			    self.getStockNews();
+                self.hasCollected();
+            }, 1000);
+
 		},
 	};
 </script>

@@ -91,10 +91,11 @@
 		}
 	}
 	.navigator-preview:hover {
-		.navigator-panel { opacity: 1 }
+		.navigator-panel { opacity: 1; visibility: visible;}
 	}
 	.navigator-panel {
 		opacity: 0;
+        visibility: hidden;
 		position: absolute;
 		top: 60px;
 		right: 20px;
