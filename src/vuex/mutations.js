@@ -1,7 +1,8 @@
-import { STOCK } from '../common/constants';
+import { STOCK, USER, COLLECTION } from '../common/constants';
 
 export default {
     [STOCK.STOCK_INDEX_SEARCH.name] (state, payload) {
+    	console.log(payload);
         const data = payload.showapi_res_body;
         const { contentlist: contentList } = data;
 
@@ -78,9 +79,11 @@ export default {
         const data = payload.showapi_res_body;
         const { list } = data;
 
+
         delete data.list;
 
         for (const key in data) { list[key] = data[key]; }
+
         state.nameToStockInfo = list;
     },
     [STOCK.STOCK_LIST.name] (state, payload) {
@@ -101,5 +104,42 @@ export default {
         for (const key in data) { list[key] = data[key]; }
         state.recentTrade = list;
     },
+    [STOCK.STOCK_NEWS.name] (state, payload) {
+    	const { data } = payload;
+    	state.stockNews = data.data;
+    },
+    [USER.USER_REGISTER.name] (state, payload) {
+    	const { data } = payload;
+    	state.userInfo = data;
+    },
+    [USER.USER_LOGIN.name] (state, payload) {
+    	const { data } = payload;
+    	state.userInfo = data;
+    },
+    [USER.USER_LOGOUT.name] (state, payload) {
+    	state.userInfo = {};
+    },
+    [USER.USER_GET_MY_INFO.name] (state, payload) {
+    	const { data } = payload;
+    	state.userInfo = data;
+    },
+    [COLLECTION.COLLECTION_COLLECT.name] (state, payload) {
+    	const { data } = payload;
+    },
+    [COLLECTION.COLLECTION_UNCOLLECT.name] (state, payload) {
+    	const { data } = payload;
+    },
+    [COLLECTION.COLLECTION_GET_COLLECTED.name] (state, payload) {
+    	const { data } = payload;
+    	state.collectionTable = data;
+    },
+    [COLLECTION.COLLECTION_HAS_COLLECTED.name] (state, payload) {
+    	const { data } = payload;
+
+    },
+    [COLLECTION.COLLECTION_DELETE_BY_ID.name] (state, payload) {
+        const { id } = payload;
+        state.collectionTable = state.collectionTable.filter(data => data.stockId !== id);
+    }
 };
 

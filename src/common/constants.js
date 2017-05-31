@@ -70,5 +70,59 @@ export const STOCK = {
         "method": "GET",
         "name": "STOCK_EVERY_TRADE",
         "path": "http://ali-stock.showapi.com/everytrade"
+    },
+    "STOCK_NEWS": {
+    	"method": "GET",
+    	"name": "STOCK_NEWS",
+    	"path": "http://web.ifzq.gtimg.cn/appstock/news/info/search"
+    }
+};
+
+export const USER = {
+	"USER_REGISTER": {
+		"method": "POST",
+		"name": "USER_REGISTER",
+		"path": "/user/register"
+	},
+	"USER_LOGIN": {
+		"method": "POST",
+		"name": "USER_LOGIN",
+		"path": "/user/login"
+	},
+	"USER_LOGOUT": {
+		"method": "GET",
+		"name": "USER_LOGOUT",
+		"path": "/user/logout"
+	},
+	"USER_GET_MY_INFO": {
+		"method": "GET",
+		"name": "USER_GET_MY_INFO",
+		"path": "/user/getMyInfo"
+	}
+};
+
+export const COLLECTION = {
+	"COLLECTION_COLLECT": {
+		"method": "POST",
+		"name": "COLLECTION_COLLECT",
+		"path": "/collection/collect"
+	},
+	"COLLECTION_UNCOLLECT": {
+		"method": "GET",
+		"name": "COLLECTION_UNCOLLECT",
+		"path": "/collection/unCollect"
+	},
+	"COLLECTION_GET_COLLECTED": {
+		"method": "GET",
+		"name": "COLLECTION_GET_COLLECTED",
+		"path": "/collection/getCollected"
+	},
+	"COLLECTION_HAS_COLLECTED": {
+		"method": "GET",
+		"name": "COLLECTION_HAS_COLLECTED",
+		"path": "/collection/hasCollected"
+	},
+    "COLLECTION_DELETE_BY_ID": {
+        "name": "COLLECTION_DELETE_BY_ID"
     }
 };

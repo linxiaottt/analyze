@@ -22,5 +22,11 @@ export default  {
     // 股票列表查询
     stockList: [],
     // 沪深股票最新50条逐笔交易
-    recentTrade: []
+    recentTrade: [],
+    // 储存用户信息
+    userInfo: {},
+    // 股票信息
+    stockNews: [],
+    // 收藏数目
+    collectionTable: [],
 };

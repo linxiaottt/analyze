@@ -3,7 +3,7 @@
 > A Vue.js project
 
 ## Clone to local
-git clone https://github.com/linxiaottt/analyze
+git clone https://github.com/FanHehe/analyze.git
 它默认会把仓库克隆到本地的同名路径下，本地的意思就是命令行所在的当前路径。
 比如 在~下执行此命令 则会把仓库内的所有内容复制到 ~/analyze中。
 

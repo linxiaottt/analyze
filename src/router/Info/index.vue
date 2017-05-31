@@ -1,9 +1,18 @@
 <template>
-	<div class = "info-container">
-		<div class = "info-main">
-			<ul class = "info-short">
-				<div class = "info-title">股票基本信息</div>
-				<li v-for = "(value, key, index) in stockInfo" :key = "index" v-if = "value.length">
+	<div class = "info-wrap">
+        <Navigator />
+		<div class = "info-container">
+			<div class = "info-main">
+				<ul class = "info-short">
+					<div class = "info-title">股票基本信息
+						<span class = "info-collect"
+						:class = "{'info-collected': isCollected}"
+						v-loading.lock = "isLoading"
+						@click = "collect">
+						{{ isCollected ? "已收藏" : "收藏" }}
+					</span>
+				</div>
+				<li v-for = "(value, key, index) in stockInfo" :key = "index" v-if = "value.length" >
 					<span class = "info-stock-key"> {{ key | stockKeyFilter }} : </span>
 					<span class = "info-stock-value"> {{ value }}</span>
 				</li>
@@ -37,21 +46,39 @@
 			</ul>
 		</div>
 	</div>
+	<div class = "info-something">
+		<h2 class = "info-stock-name">相关信息</h2>
+		<div class = "info-sth-container">
+			<el-table :data="stockNews" border style="width: 100%" @row-click = "handleClickNewsTableRow">
+				<el-table-column prop="title" label="标题" sortable width="500">
+				</el-table-column>
+				<el-table-column prop="time" label="时间" width="500">
+				</el-table-column>
+			</el-table>
+		</div>
+	</div>
+    <Login />
+</div>
 </template>
 <script>
+    import PUBSUB from 'pubsub-js';
 	import Datepicker from 'vuejs-datepicker';
 	import { mapState, mapGetters } from 'vuex';
 
 	import K from '../../components/K';
+    import Login from '../../components/Login';
 	import Selector from '../../components/Selector';
+    import Navigator from '../../components/Navigator';
 
-	import { STOCK } from '../../common/constants';
+	import { STOCK, COLLECTION } from '../../common/constants';
 
 	export default {
 		data () {
 			return {
 				stockInfo: {},
 				realtime: {},
+				isCollected: false,
+				isLoading: false,
 				k: {
 					x: [],
 					y: [],
@@ -100,12 +127,14 @@
 		},
 		computed: {
 			...mapState([
+				'userInfo',
+				'stockNews',
 				'realTimeK',
 				'realStockInfo',
 				'nameToStockInfo',
-			]),
+				]),
 		},
-		components: { K, Datepicker, Selector },
+		components: { K, Datepicker, Selector, Login, Navigator },
 		filters: {
 			timeListFilter (value, stockInfo) {
 				const market = 'hk';
@@ -124,6 +153,8 @@
 					case 'profit_four': return '四季度净利润';
 					case 'currcapital': return '当前股本(万股)';
 					case 'totalcapital': return '总股本(万股)';
+                    case 'ct': return '返回时间';
+                    case 'listing_date': return '列表时间';
 					default: return value;
 				};
 			},
@@ -179,9 +210,50 @@
 			},
 		},
 		methods: {
+			collect () {
+				if (this.isLoading) return ;
+				if (!this.userInfo.id) return this.callLater(this.hasCollected.bind(this)) && PUBSUB.publish('login-show', "login");
+				if (this.isCollected) return this.unCollect();
+				const { code, market, name: stockName } = this.stockInfo;
+				const { name } = COLLECTION.COLLECTION_COLLECT;
+				const final = () => { this.isLoading = false; };
+				const success = () => { this.isCollected = !this.isCollected; };
+				this.publish(name, { success, final, data: { code, market, username: this.userInfo.username, name: stockName }});
+			},
+            hasCollected () {
+                const { code, market } = this.stockInfo;
+                const { name } = COLLECTION.COLLECTION_HAS_COLLECTED;
+                const  success  = (payload) => { this.isCollected = payload.data.has; };
+                this.publish(name, { success, query: { market, code, username: this.userInfo.username } });
+            },
+			unCollect() {
+				const { code, market } = this.stockInfo;
+				const { name } = COLLECTION.COLLECTION_UNCOLLECT;
+				const final = () => { this.isLoading = false; };
+				const success = () => { this.isCollected = !this.isCollected; };
+				this.publish(name, { success, final, query: { code, market, username: this.userInfo.username }});
+			},
 			publish (type, payload) {
 				const { dispatch } = this.$store;
 				dispatch({ ... payload, type });
+			},
+            callLater (callback, time) {
+                time = time || 1000;
+                console.log(this, 1);
+                setTimeout(callback.bind(this), time);
+                return true;
+            },
+            handleClickNewsTableRow (data) {
+                if (data.url) window.open(data.url);
+            },
+			getStockNews () {
+				const n = 51;
+				const page = 1;
+				const type = 2;
+                const { market, code } = this.stockInfo;
+				const symbol = market + code;
+				const _var = "finance_news";
+				this.publish(STOCK.STOCK_NEWS.name, { query: { n, page, type, symbol }});
 			},
 			getNameToStockInfo (code) {
 				const query = { code };
@@ -223,22 +295,39 @@
 		},
 		mounted () {
 			const { code } = this.$route.params;
+            const self = this;
 			this.getNameToStockInfo(code);
 			this.getRealStockInfo(code);
 			this.getRealTimeK({ code });
+            setTimeout(function () {
+			    self.getStockNews();
+                self.hasCollected();
+            }, 1000);
+
 		},
 	};
 </script>
 <style lang = "scss">
+	.info-wrap { height: 100%; overflow: scroll; }
+	.info-something {
+		height: 100%;
+		background: inherit;
+		background-color: #4f7f9b;
+		background-position: fixed;
+		background-repeat: repeat-x;
+		background-image: linear-gradient(#4f7f9b, #293c55);
+		.info-stock-name { font-size: 24px;  padding: 20px 0 0; text-align: center; color: #ffffff;}
+	}
 	.info-container {
 		display: flex;
 		flex-direction: row;
 
 		width: 100%;
 		height: 100%;
-		padding: 20px;
-		box-sizing: border-box;
 
+        padding: 20px;
+		box-sizing: border-box;
+		box-shadow: 0px 5px 5px 0 #5f3c55;
 		color: #ffffff;
 		font-size: 10px;
 
@@ -262,8 +351,18 @@
 	}
 	.border { border: 1px solid #ffffff; border-radius: 4px; }
 
-	 /*区块处理*/
-	 .info-title { width: 100%; box-sizing: border-box; text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+	/*区块处理*/
+	.info-title { position: relative; width: 100%; box-sizing: border-box; text-align: center; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+	.info-collect {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		height: 100%;
+		font-size: .6em;
+		cursor: pointer;
+		&:hover { color: #20a0ff; }
+	}
+	.info-collected { color: #666666; &:hover { color: #666666; } }
 	.info-short {
 		font-size: 0;
 		li {

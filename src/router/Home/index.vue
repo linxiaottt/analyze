@@ -1,5 +1,6 @@
 <template>
 	<div class = "home-container">
+		<Navigator />
 		<div class = "main" :style = "{ top: -state.index * height + 'px' }">
 			<section class = "section" id = "sec-1" ref = "canvas">
 				<h1>股票分析系统</h1>
@@ -42,7 +43,9 @@
 								{{ (rowIndex + 1) + (indexListSearch.currentPage - 1) * indexListSearch.maxResult + (state.indexSearchPage - 1) *numPerPage }}
 							</span>
 							<li v-for = "(col, colIndex) in row"
-								:key = "colIndex">
+								:key = "colIndex" 
+                                @click = "handleClickTableRow(row)"
+                                >
 								{{ col }}
 							</li>
 						</ul>
@@ -80,6 +83,7 @@
 				<a href="javascript:void(0)">沪深股票最新50条逐笔交易查询</a>
 			</ul>
 		</div>
+		<Login />
 	</div>
 </template>
 <script>
@@ -94,6 +98,10 @@
 
 	import Canvas from './Canvas';
 	import Point, { distance } from './Point';
+
+	import Login from '../../components/Login';
+	import Navigator from '../../components/Navigator';
+
 	export default {
 		data () {
 			return {
@@ -133,14 +141,15 @@
 				'nameToStockInfoDropdown',
 			]),
 		},
-		components: { Page, MyTable, Search },
+		components: { Page, MyTable, Search, Navigator, Login },
 		methods: {
 			nameToStockInfoSubmit (content) {
+				console.log(this.state.loadingNameToStockInfo, content);
 				if (this.checkLoading('loadingNameToStockInfo')) return ;
 				const query = {};
 				const numReg = /^[0-9]{3,6}$/;
-				const pinyinReg = /^[a-zA-Z]{1, 8}$/;
-				const chineseReg = /[\u4E00-\u9FA5]/;
+				const pinyinReg = /^[a-zA-Z]{1,8}$/;
+				const chineseReg = /[\u4E00-\u9FA5]/g;
 				if (numReg.test(content)) query.code = content;
 				else if (pinyinReg.test(content)) query.pinyin = content;
 				else if (chineseReg.test(content)) query.name = content;
@@ -334,6 +343,9 @@
 				this.state[key] = true;
 				setTimeout(() => { this.state[key] = false; });
 			},
+            handleClickTableRow ({ code }) {
+                this.$router.push(`/stock/${ code }`);
+            }
 		},
 		mounted () {
 			const chart = this.$refs.chart;
@@ -341,7 +353,7 @@
 			// 测试api
 			// this.getIndexTimeLine();
 			// this.getIndexList();
-			this.getRealTimeK();
+			// this.getRealTimeK();
 			// this.getTimeline();
 			// this.getHistory();
 			// this.getKLine();
@@ -420,16 +432,17 @@
 		}
 	}
 	.section-search {
-		margin-top: 20px;
+		margin-top: 100px;
 	}
 	.sec-2-filter {
-		margin: 40px 0 40px;
+		margin: 80px 0 40px;
 		position: relative;
 
 		.drop-down {
 			width: 128px;
 			height: 40px;
 			line-height: 40px;
+			text-align: center;
 			margin: 0 auto;
 			color: #000000;
 			background: #FFFFFF;
@@ -459,12 +472,12 @@
 		}
 	}
 	#sec-2 .sec-2-content {
+		padding-top: 80px;
+
 		.cell {
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			/*box-shadow: 0px 0px 0px 1px #ffffff;*/
-			/*& { border-bottom: 1px solid #ffffff; };*/
 		}
 		.sec-2-list {
 			display: flex;
